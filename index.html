@@ -1,0 +1,1984 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Konstellation — dina tio siffror, ditt mönster</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,340;0,9..144,460;0,9..144,620;1,9..144,400&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0B101D; --bg2:#0E1426; --panel:rgba(148,168,220,.055); --panel2:rgba(148,168,220,.09);
+  --line:rgba(232,199,118,.14); --hair:rgba(160,175,210,.12);
+  --text:#EAEDF6; --muted:#8E96AE; --faint:#5B6379;
+  --gold:#E8C776; --gold-dim:rgba(232,199,118,.55);
+  --eld:#ED9B75; --jord:#B4C98B; --luft:#93B7EC; --vatten:#7BD1C0;
+  --danger:#E88A8A; --ok:#9BD1A6;
+  --r:18px; --r-s:12px;
+  --disp:"Fraunces",Georgia,"Times New Roman",serif;
+  --sans:"Sora",-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{background:#060910;color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.55;
+  min-height:100dvh;display:flex;justify-content:center}
+#frame{width:100%;max-width:440px;min-height:100dvh;position:relative;background:
+  radial-gradient(120% 60% at 50% -5%, #17203B 0%, var(--bg) 55%, #080C16 100%);
+  box-shadow:0 0 90px rgba(0,0,0,.6);display:flex;flex-direction:column;overflow:hidden}
+#sky{position:absolute;inset:0;pointer-events:none;z-index:0;opacity:.9}
+#appwrap{position:relative;z-index:1;display:flex;flex-direction:column;min-height:100dvh}
+main{flex:1;overflow-y:auto;padding:0 18px 108px;scrollbar-width:none}
+main::-webkit-scrollbar{display:none}
+
+/* ---------- Typography ---------- */
+h1,h2,h3,.disp{font-family:var(--disp);font-weight:460;letter-spacing:.005em}
+h1{font-size:30px;line-height:1.15}
+h2{font-size:21px;line-height:1.2}
+h3{font-size:16px}
+.eyebrow{font-family:var(--sans);font-size:10.5px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-dim)}
+.muted{color:var(--muted)} .faint{color:var(--faint)} .small{font-size:13px}
+.serif-i{font-family:var(--disp);font-style:italic;font-weight:400}
+.num{font-variant-numeric:tabular-nums}
+
+/* ---------- Cards & structure ---------- */
+.card{background:var(--panel);border:1px solid var(--hair);border-radius:var(--r);padding:18px;margin-top:14px;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.card.gold{border-color:var(--line)}
+.sect-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:26px 2px 2px}
+.hairline{height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);margin:22px 0 4px}
+.row{display:flex;align-items:center;gap:10px}
+.spread{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.chip{font-size:12px;padding:5px 11px;border-radius:99px;border:1px solid var(--hair);color:var(--muted);background:rgba(255,255,255,.02)}
+.chip.on{border-color:var(--gold-dim);color:var(--gold);background:rgba(232,199,118,.08)}
+.chip.mini{font-size:11px;padding:3px 9px}
+.tag{font-size:11px;padding:2px 8px;border-radius:99px;background:var(--panel2);color:var(--muted)}
+.pill-el{font-size:11px;font-weight:600;padding:3px 9px;border-radius:99px}
+.el-Eld{color:var(--eld);background:rgba(237,155,117,.12)} .el-Jord{color:var(--jord);background:rgba(180,201,139,.12)}
+.el-Luft{color:var(--luft);background:rgba(147,183,236,.12)} .el-Vatten{color:var(--vatten);background:rgba(123,209,192,.12)}
+.tx-Eld{color:var(--eld)} .tx-Jord{color:var(--jord)} .tx-Luft{color:var(--luft)} .tx-Vatten{color:var(--vatten)}
+
+/* ---------- Buttons & inputs ---------- */
+button{font-family:var(--sans);cursor:pointer;border:none;background:none;color:var(--text)}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:15px;border-radius:14px;
+  font-size:15px;font-weight:600;transition:transform .12s ease,opacity .2s}
+.btn:active{transform:scale(.98)}
+.btn-gold{background:linear-gradient(135deg,#EFD08A,#D8AE55);color:#241B08}
+.btn-ghost{border:1px solid var(--hair);color:var(--text);background:rgba(255,255,255,.03)}
+.btn-line{border:1px solid var(--line);color:var(--gold);background:rgba(232,199,118,.06)}
+.btn-sm{width:auto;padding:9px 15px;font-size:13px;border-radius:11px}
+.btn[disabled]{opacity:.4;pointer-events:none}
+.linkish{color:var(--gold);font-size:13.5px;font-weight:500;padding:6px 4px}
+input,select{font-family:var(--sans);width:100%;background:rgba(10,14,26,.7);border:1px solid var(--hair);
+  border-radius:13px;padding:14px 15px;font-size:16px;color:var(--text);outline:none;transition:border-color .2s}
+input:focus,select:focus{border-color:var(--gold-dim)}
+input.pnr{font-size:21px;letter-spacing:.14em;text-align:center;font-variant-numeric:tabular-nums}
+input.err{border-color:var(--danger)}
+label.fld{display:block;font-size:12px;color:var(--muted);margin:12px 0 6px;letter-spacing:.04em}
+.fieldmsg{font-size:12.5px;margin-top:8px;min-height:18px}
+.fieldmsg.bad{color:var(--danger)} .fieldmsg.good{color:var(--ok)}
+:focus-visible{outline:2px solid var(--gold-dim);outline-offset:2px;border-radius:6px}
+
+/* ---------- Tab bar ---------- */
+#tabbar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:440px;z-index:40;
+  display:flex;padding:8px 10px calc(10px + env(safe-area-inset-bottom));
+  background:linear-gradient(180deg,rgba(9,13,23,.6),rgba(9,13,23,.96) 40%);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--hair)}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 0;color:var(--faint);
+  font-size:10.5px;font-weight:500;letter-spacing:.05em;border-radius:12px;transition:color .2s}
+.tab svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.tab.on{color:var(--gold)}
+.tab .dotmark{width:3px;height:3px;border-radius:99px;background:transparent;margin-top:1px}
+.tab.on .dotmark{background:var(--gold)}
+
+/* ---------- Header ---------- */
+.viewhead{padding:26px 2px 4px}
+.viewhead .eyebrow{display:block;margin-bottom:5px}
+
+/* ---------- Score dial ---------- */
+.dial{position:relative;width:150px;height:150px;margin:6px auto}
+.dial svg{transform:rotate(-90deg)}
+.dial .val{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.dial .val b{font-family:var(--disp);font-size:40px;font-weight:460;line-height:1}
+.dial .val span{font-size:10px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;margin-top:4px}
+
+/* ---------- Bars ---------- */
+.bar{height:7px;border-radius:99px;background:rgba(255,255,255,.07);overflow:hidden;flex:1}
+.bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#C9A75B,var(--gold));transition:width .7s cubic-bezier(.2,.8,.2,1)}
+.barrow{display:flex;align-items:center;gap:11px;margin-top:11px;font-size:12.5px}
+.barrow .lab{width:92px;color:var(--muted);flex-shrink:0}
+.barrow .pct{width:38px;text-align:right;color:var(--text);font-weight:500;flex-shrink:0}
+
+/* ---------- People list ---------- */
+.pcard{display:flex;align-items:center;gap:13px;padding:13px 14px;margin-top:10px;background:var(--panel);
+  border:1px solid var(--hair);border-radius:15px;width:100%;text-align:left;transition:background .2s}
+.pcard:active{background:var(--panel2)}
+.avatar{width:44px;height:44px;border-radius:99px;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  font-family:var(--disp);font-size:17px;border:1px solid var(--hair);position:relative}
+.avatar .zsym{position:absolute;bottom:-4px;right:-4px;font-size:11px;background:var(--bg2);border:1px solid var(--hair);
+  border-radius:99px;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-family:var(--sans)}
+.pmeta{flex:1;min-width:0}
+.pmeta b{display:block;font-weight:600;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pmeta .sub{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.matchbadge{font-size:12px;font-weight:600;color:var(--gold);flex-shrink:0;text-align:right}
+.matchbadge small{display:block;font-size:9.5px;color:var(--faint);font-weight:500;letter-spacing:.08em}
+
+/* ---------- Sheets ---------- */
+#scrim{position:fixed;inset:0;background:rgba(4,6,12,.6);backdrop-filter:blur(3px);z-index:60;opacity:0;pointer-events:none;transition:opacity .25s}
+#scrim.show{opacity:1;pointer-events:auto}
+.sheet{position:fixed;bottom:0;left:50%;transform:translate(-50%,105%);width:100%;max-width:440px;max-height:88dvh;
+  z-index:70;background:linear-gradient(180deg,#141B30,#0E1424);border-radius:24px 24px 0 0;border:1px solid var(--hair);border-bottom:none;
+  transition:transform .32s cubic-bezier(.2,.9,.25,1);display:flex;flex-direction:column}
+.sheet.show{transform:translate(-50%,0)}
+.sheet .grab{width:38px;height:4px;border-radius:99px;background:rgba(255,255,255,.16);margin:10px auto 2px;flex-shrink:0}
+.sheet .body{overflow-y:auto;padding:10px 20px calc(26px + env(safe-area-inset-bottom));scrollbar-width:none}
+.sheet .body::-webkit-scrollbar{display:none}
+
+/* ---------- Onboarding ---------- */
+
+/* --- v2 --- */
+.nowgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px}
+.nowcell{background:rgba(255,255,255,.035);border:1px solid var(--line);border-radius:14px;padding:10px 6px;text-align:center}
+.nowcell b{font-family:var(--disp);font-size:19px;display:block}
+.nowcell span{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+.nowline{display:flex;align-items:center;gap:9px;margin-top:12px;font-size:13px;color:var(--muted)}
+.nowline .moonchip{font-size:19px}
+.moonbig{font-size:56px;text-align:center;line-height:1;filter:drop-shadow(0 0 18px rgba(232,199,118,.25))}
+.dayrow{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+.dayrow:last-child{border-bottom:0}
+.dayrow .dnum{font-family:var(--disp);font-size:15px;color:var(--gold);min-width:76px}
+.dayrow .dwhy{font-size:12.5px;color:var(--muted);flex:1}
+.dayrow .dbar{width:44px;height:4px;border-radius:2px;background:rgba(255,255,255,.08);overflow:hidden;flex-shrink:0}
+.dayrow .dbar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold-dim),var(--gold))}
+.staravatar{position:relative}
+.staravatar::after{content:'✦';position:absolute;top:-7px;right:-7px;font-size:13px;color:var(--gold);animation:pulse 2.4s infinite}
+@keyframes pulse{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:1;transform:scale(1.25)}}
+.sortseg{display:flex;gap:4px;margin-left:auto}
+.sortseg button{font-size:10.5px;letter-spacing:.05em;color:var(--faint);padding:5px 9px;border-radius:9px;border:1px solid transparent}
+.sortseg button.on{color:var(--gold);border-color:rgba(232,199,118,.3);background:rgba(232,199,118,.06)}
+
+/* --- v3 --- */
+.p4ghost{display:block;margin:8px auto 0;font-size:11.5px;color:var(--gold-dim);border:1px dashed rgba(232,199,118,.3);border-radius:99px;padding:5px 13px}
+.digitband .p4{opacity:.55;width:22px;height:32px;font-size:17px}
+.digitband .dsep{color:var(--faint);align-self:center;font-size:14px;width:auto}
+.dprof{display:grid;grid-template-columns:repeat(9,1fr);gap:5px;margin-top:12px;align-items:end;height:64px}
+.dprof .col{display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end}
+.dprof .col i{display:block;width:70%;border-radius:3px 3px 0 0;background:linear-gradient(180deg,var(--gold),var(--gold-dim));min-height:3px}
+.dprof .col.zero i{background:rgba(255,255,255,.09)}
+.dprof .col span{font-size:10px;color:var(--faint);font-family:var(--disp)}
+.strip7{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:12px}
+.strip7 .sd{text-align:center;padding:8px 2px 7px;border-radius:11px;background:rgba(255,255,255,.03);border:1px solid var(--line)}
+.strip7 .sd b{display:block;width:9px;height:9px;border-radius:50%;margin:0 auto 5px}
+.strip7 .sd span{font-size:9.5px;color:var(--faint);text-transform:uppercase;letter-spacing:.04em}
+.strip7 .sd.crit{border-color:rgba(232,199,118,.4)}
+.ovrow{display:flex;align-items:center;gap:11px;width:100%;text-align:left;padding:13px 14px;border-radius:16px;border:1px solid var(--line);background:rgba(255,255,255,.025);margin-top:9px}
+.ovrow .rank{font-family:var(--disp);font-size:13px;color:var(--faint);min-width:20px}
+.ovrow .meta{flex:1;min-width:0}
+.ovrow .meta b{display:block;font-size:14.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ovrow .meta .why{font-size:11.5px;color:var(--muted);margin-top:2px}
+.ovrow .nums{text-align:right;flex-shrink:0}
+.ovrow .nums .sc{font-family:var(--disp);font-size:19px;color:var(--gold)}
+.ovrow .nums .fs{font-size:10.5px;color:var(--muted)}
+.trend{font-size:11px}.trend.up{color:#9AD9A5}.trend.dn{color:#E09B8E}.trend.flat{color:var(--faint)}
+.deepbadge{font-size:9px;letter-spacing:.09em;color:var(--gold);border:1px solid rgba(232,199,118,.4);border-radius:6px;padding:2px 5px;vertical-align:2px;margin-left:6px}
+.sharedd{display:inline-flex;gap:5px;margin-top:8px}
+.sharedd i{font-style:normal;font-family:var(--disp);width:24px;height:24px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:rgba(232,199,118,.1);color:var(--gold);font-size:13px;border:1px solid rgba(232,199,118,.25)}
+
+/* --- v4 --- */
+.talgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-top:12px}
+.talcell{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:15px;padding:12px 6px;text-align:center;transition:border-color .2s}
+.talcell:active{border-color:rgba(232,199,118,.5)}
+.talcell b{font-family:var(--disp);font-size:25px;color:var(--gold);display:block;line-height:1.1}
+.talcell span{font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);display:block;margin-top:4px}
+.talcell.ghost{border-style:dashed}.talcell.ghost b{color:var(--faint);font-size:19px}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
+.duocard{border:1px solid var(--line);border-radius:16px;padding:13px 11px;background:rgba(255,255,255,.025);text-align:center}
+.duocard .nm{font-weight:600;font-size:14px}
+.duocard .es{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5}
+.insrow{display:flex;gap:11px;padding:12px 0;border-bottom:1px solid var(--line);align-items:flex-start}
+.insrow:last-child{border:0}
+.insrow .ic{font-size:16px;flex-shrink:0;width:24px;text-align:center}
+.insrow p{font-size:13px;color:var(--muted);line-height:1.55}
+.insrow p b{color:var(--text)}
+.clearcmp{display:block;margin:10px auto 0;font-size:11.5px;color:var(--faint);text-decoration:underline;text-underline-offset:2px}
+.editrow{display:flex;gap:9px;margin-top:16px}
+
+/* --- v5 --- */
+.gear{position:absolute;top:14px;right:16px;z-index:40;width:38px;height:38px;border-radius:50%;
+  border:1px solid var(--line);background:rgba(13,19,34,.66);backdrop-filter:blur(8px);
+  color:var(--muted);font-size:17px;display:flex;align-items:center;justify-content:center}
+.gear:active{color:var(--gold);border-color:rgba(232,199,118,.4)}
+.valrows{margin:18px 0 4px}
+.valrow{display:flex;gap:12px;align-items:flex-start;padding:9px 0}
+.valrow .vi{font-size:17px;width:26px;text-align:center;flex-shrink:0;color:var(--gold)}
+.valrow p{font-size:13px;color:var(--muted);line-height:1.5;text-align:left}
+.valrow p b{color:var(--text)}
+.setsec{margin-top:18px}
+.setsec .eyebrow{display:block;margin-bottom:8px}
+.setrow{display:flex;align-items:center;gap:11px;width:100%;text-align:left;padding:12px 2px;border-bottom:1px solid var(--line);font-size:14px}
+.setrow:last-child{border:0}
+.setrow .grow{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.setrow .sub{font-size:11px;color:var(--faint);display:block}
+.setrow .cb{width:20px;height:20px;border-radius:6px;border:1.4px solid var(--line);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--gold)}
+.setrow.sel .cb{border-color:var(--gold);background:rgba(232,199,118,.12)}
+.setrow .mini-edit{color:var(--faint);font-size:15px;padding:4px 8px}
+.danger{color:#E09B8E!important}
+.minibars{display:flex;gap:5px;align-items:flex-end;height:34px}
+.minibars i{width:9px;border-radius:2.5px 2.5px 0 0;display:block;min-height:3px}
+.duorytm{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.duorytm .cellr{border:1px solid var(--line);border-radius:14px;padding:11px;background:rgba(255,255,255,.02)}
+.duorytm .cellr b{font-size:12.5px;display:block;margin-bottom:8px}
+.duorytm .cellr .bd{font-size:10.5px;color:var(--faint);margin-top:7px;line-height:1.45}
+#onb{position:absolute;inset:0;z-index:50;display:flex;flex-direction:column;overflow-y:auto;padding:0 26px 40px}
+.onb-hero{padding-top:11dvh;text-align:center}
+.wordmark{font-family:var(--disp);font-size:13px;letter-spacing:.42em;text-transform:uppercase;color:var(--gold);font-weight:460}
+.onb-hero h1{font-size:36px;margin-top:22px;font-weight:340}
+.onb-hero h1 em{font-style:italic;font-weight:400;color:var(--gold)}
+.digitband{display:flex;justify-content:center;gap:6px;margin:26px 0 6px}
+.digitband span{font-family:var(--disp);font-size:20px;color:var(--gold-dim);width:26px;height:36px;display:flex;
+  align-items:center;justify-content:center;border:1px solid var(--line);border-radius:8px;background:rgba(232,199,118,.04)}
+.mode-toggle{display:flex;background:rgba(255,255,255,.04);border:1px solid var(--hair);border-radius:12px;padding:4px;margin-top:26px}
+.mode-toggle button{flex:1;padding:9px;border-radius:9px;font-size:13px;color:var(--muted);font-weight:500}
+.mode-toggle button.on{background:rgba(232,199,118,.12);color:var(--gold)}
+.dob-grid{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:9px}
+
+/* ---------- Reveal ---------- */
+#reveal{position:absolute;inset:0;z-index:55;background:radial-gradient(100% 70% at 50% 30%,#151F3B,#070A13 75%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;opacity:0;pointer-events:none;transition:opacity .4s}
+#reveal.show{opacity:1;pointer-events:auto}
+#revealStage{width:270px;height:270px;position:relative}
+#revealStage .d{position:absolute;font-family:var(--disp);font-size:24px;color:var(--gold);left:50%;top:50%;
+  transition:all 1.4s cubic-bezier(.3,.7,.3,1);opacity:0}
+#revealTxt{font-family:var(--disp);font-style:italic;font-size:17px;color:var(--muted);transition:opacity .5s}
+
+/* ---------- Me hero ---------- */
+.mehero{margin-top:14px;padding:24px 20px 20px;border-radius:22px;position:relative;overflow:hidden;
+  border:1px solid var(--line);background:linear-gradient(160deg,rgba(232,199,118,.08),rgba(148,168,220,.05) 45%,rgba(11,16,29,.2))}
+.mehero .zbig{position:absolute;right:-8px;top:-16px;font-size:120px;opacity:.06;font-family:var(--sans)}
+.pnrline{display:inline-flex;align-items:center;gap:8px;margin-top:8px;font-size:13px;color:var(--muted)}
+.pnrline button{color:var(--faint);font-size:11px;text-decoration:underline;text-underline-offset:2px}
+.idrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+
+/* ---------- Big number ---------- */
+.bignum{font-family:var(--disp);font-size:64px;font-weight:340;line-height:1;color:var(--gold)}
+.numsplit{display:flex;gap:18px;align-items:flex-start}
+.numsplit .left{flex-shrink:0;text-align:center;width:76px}
+.numsplit .left .sub{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin-top:5px}
+
+/* ---------- Bio legend ---------- */
+.biokey{display:flex;gap:14px;margin-top:12px;font-size:11.5px;color:var(--muted);flex-wrap:wrap}
+.biokey i{display:inline-block;width:16px;height:3px;border-radius:2px;margin-right:5px;vertical-align:middle}
+.bionow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-top:14px}
+.bionow .cell{background:rgba(255,255,255,.03);border:1px solid var(--hair);border-radius:12px;padding:10px;text-align:center}
+.bionow .cell b{font-family:var(--disp);font-size:21px;font-weight:460;display:block}
+.bionow .cell span{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+
+/* ---------- Constellation ---------- */
+#constellation{margin-top:14px;border-radius:22px;border:1px solid var(--hair);overflow:hidden;position:relative;
+  background:radial-gradient(90% 90% at 50% 42%,#131C36 0%,#0A0F1D 70%)}
+#constellation svg{display:block;width:100%}
+.const-hint{position:absolute;bottom:10px;left:0;right:0;text-align:center;font-size:10.5px;color:var(--faint);letter-spacing:.08em;pointer-events:none}
+
+/* ---------- Compare picker ---------- */
+.duel{display:grid;grid-template-columns:1fr 34px 1fr;align-items:center;gap:6px;margin-top:14px}
+.duelslot{background:var(--panel);border:1px dashed var(--hair);border-radius:15px;padding:13px 10px;text-align:center;min-height:86px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;width:100%;transition:border-color .2s}
+.duelslot.filled{border-style:solid;border-color:var(--line)}
+.duelslot b{font-size:13.5px;font-weight:600}
+.duelslot .sub{font-size:11px;color:var(--muted)}
+.vs{font-family:var(--disp);font-style:italic;color:var(--gold-dim);text-align:center;font-size:15px}
+.seg{display:flex;background:rgba(255,255,255,.04);border:1px solid var(--hair);border-radius:12px;padding:4px;margin-top:16px}
+.seg button{flex:1;padding:9px;border-radius:9px;font-size:13px;color:var(--muted);font-weight:500}
+.seg button.on{background:rgba(232,199,118,.12);color:var(--gold)}
+
+/* ---------- QR ---------- */
+.qrbox{width:216px;height:216px;margin:16px auto 8px;background:#F3EFE4;border-radius:16px;display:flex;align-items:center;justify-content:center;padding:14px}
+.qrbox canvas,.qrbox img,.qrbox svg{border-radius:4px;max-width:100%;max-height:100%}
+.codechip{display:flex;align-items:center;gap:9px;background:rgba(10,14,26,.7);border:1px solid var(--hair);border-radius:12px;
+  padding:11px 13px;margin-top:12px}
+.codechip code{flex:1;font-size:11.5px;color:var(--muted);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-family:ui-monospace,monospace}
+.scanframe{position:relative;height:230px;border-radius:18px;overflow:hidden;margin-top:14px;border:1px solid var(--hair);
+  background:repeating-linear-gradient(0deg,#0A0F1D 0 3px,#0C1222 3px 6px)}
+.scanframe .corner{position:absolute;width:26px;height:26px;border:2.5px solid var(--gold);opacity:.85}
+.scanframe .laser{position:absolute;left:12%;right:12%;height:2px;background:linear-gradient(90deg,transparent,var(--vatten),transparent);
+  box-shadow:0 0 14px var(--vatten);animation:laser 2.4s ease-in-out infinite}
+@keyframes laser{0%,100%{top:18%}50%{top:80%}}
+.scanframe .msg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--faint);font-size:12.5px;text-align:center;padding:0 30px}
+
+/* ---------- Toast ---------- */
+#toast{position:fixed;left:50%;bottom:100px;transform:translate(-50%,20px);background:#1C2542;border:1px solid var(--line);
+  color:var(--text);padding:11px 18px;border-radius:99px;font-size:13.5px;z-index:90;opacity:0;pointer-events:none;transition:all .3s;max-width:85%;text-align:center}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* ---------- Group manage ---------- */
+.grprow{display:flex;align-items:center;gap:11px;padding:12px 4px;border-bottom:1px solid rgba(255,255,255,.05)}
+.grprow .gname{flex:1;font-weight:500}
+.iconbtn{width:36px;height:36px;border-radius:11px;display:flex;align-items:center;justify-content:center;border:1px solid var(--hair);color:var(--muted);flex-shrink:0}
+
+/* ---------- Anim helpers ---------- */
+.fadein{animation:fin .5s ease both}
+@keyframes fin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.stagger>*{animation:fin .55s ease both}
+.stagger>*:nth-child(2){animation-delay:.06s}.stagger>*:nth-child(3){animation-delay:.12s}
+.stagger>*:nth-child(4){animation-delay:.18s}.stagger>*:nth-child(5){animation-delay:.24s}
+.stagger>*:nth-child(6){animation-delay:.3s}.stagger>*:nth-child(7){animation-delay:.36s}
+.stagger>*:nth-child(8){animation-delay:.42s}.stagger>*:nth-child(9){animation-delay:.48s}
+@keyframes twinkle{0%,100%{opacity:.25}50%{opacity:.9}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.hidden{display:none!important}
+.mt6{margin-top:6px}.mt10{margin-top:10px}.mt14{margin-top:14px}.mt18{margin-top:18px}.mt22{margin-top:22px}
+.center{text-align:center}
+</style>
+</head>
+<body>
+<div id="frame">
+  <canvas id="sky"></canvas>
+  <div id="appwrap">
+    <main id="main"></main>
+  </div>
+
+  <!-- Onboarding -->
+  <div id="onb" class="hidden"></div>
+  <!-- Reveal sequence -->
+  <div id="reveal"><div id="revealStage"></div><div id="revealTxt"></div></div>
+
+  <!-- Tab bar -->
+  <button class="gear hidden" id="gearBtn" aria-label="Inställningar">⚙</button>
+<nav id="tabbar" class="hidden">
+    <button class="tab" data-tab="me" aria-label="Jag">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c1.4-3.6 4-5.2 7-5.2s5.6 1.6 7 5.2"/></svg>
+      Jag<span class="dotmark"></span></button>
+    <button class="tab" data-tab="circle" aria-label="Kretsen">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><circle cx="12" cy="4" r="1.6"/><circle cx="19" cy="9" r="1.6"/><circle cx="17" cy="18" r="1.6"/><circle cx="7" cy="18" r="1.6"/><circle cx="5" cy="9" r="1.6"/><path d="M12 6v4M13.8 11l3.6-1.4M13.3 13.6l2.6 3M10.7 13.6l-2.6 3M10.2 11L6.6 9.6"/></svg>
+      Kretsen<span class="dotmark"></span></button>
+    <button class="tab" data-tab="compare" aria-label="Jämför">
+      <svg viewBox="0 0 24 24"><circle cx="9" cy="12" r="5.5"/><circle cx="15" cy="12" r="5.5"/></svg>
+      Jämför<span class="dotmark"></span></button>
+    <button class="tab" data-tab="connect" aria-label="Koppla">
+      <svg viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1.4"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.4"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.4"/><path d="M14 14h2.6v2.6H14zM17.5 17.5H20V20h-2.5z"/></svg>
+      Koppla<span class="dotmark"></span></button>
+  </nav>
+
+  <div id="scrim"></div>
+  <div id="sheet" class="sheet" role="dialog" aria-modal="true"><div class="grab"></div><div class="body" id="sheetBody"></div></div>
+  <div id="toast"></div>
+</div>
+<script>
+'use strict';
+/* ================= ENGINE ================= */
+// ===== KONSTELLATION ENGINE (pure, deterministic) =====
+const KE = (() => {
+
+// ---------- Personnummer ----------
+function luhnCheck(digits9) { // string of 9 digits YYMMDDNNN -> check digit
+  let sum = 0;
+  for (let i = 0; i < 9; i++) {
+    let d = +digits9[i] * (i % 2 === 0 ? 2 : 1);
+    if (d > 9) d -= 9;
+    sum += d;
+  }
+  return (10 - (sum % 10)) % 10;
+}
+
+function daysInMonth(y, m) { return new Date(y, m, 0).getDate(); }
+
+// Accepts: YYMMDD-XXXX, YYMMDDXXXX, YYYYMMDD-XXXX, YYYYMMDDXXXX, +-separator for 100+
+function parsePersonnummer(raw) {
+  const s = (raw || '').trim();
+  const m = s.replace(/\s/g, '').match(/^(\d{2})?(\d{2})(\d{2})(\d{2})([-+]?)(\d{3})(\d)$/);
+  if (!m) return { ok: false, error: 'format' };
+  const [, cc, yy, mm, dd, sep, nnn, chk] = m;
+  let year;
+  const now = new Date();
+  if (cc) {
+    year = +(cc + yy);
+  } else {
+    const cur2 = now.getFullYear() % 100;
+    year = (+yy <= cur2 ? 2000 : 1900) + +yy;
+    if (sep === '+') year -= 100;
+  }
+  const month = +mm, day = +dd;
+  if (month < 1 || month > 12 || day < 1 || day > daysInMonth(year, month)) return { ok: false, error: 'date' };
+  if (year < 1900 || year > now.getFullYear()) return { ok: false, error: 'date' };
+  const expect = luhnCheck(yy + mm + dd + nnn);
+  if (expect !== +chk) return { ok: false, error: 'luhn', expected: expect };
+  const gender = (+nnn[2]) % 2 === 1 ? 'man' : 'kvinna';
+  const birth = new Date(year, month - 1, day);
+  if (birth > now) return { ok: false, error: 'date' };
+  return { ok: true, year, month, day, gender, pnr: `${yy}${mm}${dd}-${nnn}${chk}` };
+}
+
+function parseBirthdate(y, m, d) {
+  const year = +y, month = +m, day = +d;
+  const now = new Date();
+  if (!year || !month || !day) return { ok: false, error: 'format' };
+  if (year < 1900 || year > now.getFullYear() || month < 1 || month > 12 || day < 1 || day > daysInMonth(year, month)) return { ok: false, error: 'date' };
+  if (new Date(year, month - 1, day) > now) return { ok: false, error: 'date' };
+  return { ok: true, year, month, day, gender: null, pnr: null };
+}
+
+// ---------- Numerology ----------
+function digitSum(n) { let s = 0; for (const c of String(n)) s += +c; return s; }
+function reduce(n, keepMasters = true) {
+  while (n > 9) {
+    if (keepMasters && (n === 11 || n === 22 || n === 33)) return n;
+    n = digitSum(n);
+  }
+  return n;
+}
+function lifePath(y, m, d) {
+  // Standard: reduce year, month, day separately, then sum & reduce (masters kept)
+  const t = reduce(digitSum(y)) + reduce(m > 9 ? digitSum(m) : m) + reduce(d > 9 ? digitSum(d) : d);
+  return reduce(t);
+}
+function birthdayNumber(d) { return reduce(d); }
+function personalYear(m, d, calYear) {
+  return reduce(reduce(m) + reduce(d) + reduce(digitSum(calYear)), false); // 1-9
+}
+const LETTER_VALUES = { A:1,B:2,C:3,D:4,E:5,F:6,G:7,H:8,I:9,J:1,K:2,L:3,M:4,N:5,O:6,P:7,Q:8,R:9,S:1,T:2,U:3,V:4,W:5,X:6,Y:7,Z:8,'Å':1,'Ä':1,'Ö':6,'É':5,'Ü':3 };
+function nameNumber(name) {
+  let sum = 0;
+  for (const ch of (name || '').toUpperCase()) if (LETTER_VALUES[ch]) sum += LETTER_VALUES[ch];
+  return sum ? reduce(sum) : null;
+}
+
+// ---------- Western zodiac ----------
+const ZODIAC = [
+  { key:'capricorn',  name:'Stenbocken', sym:'♑', from:[12,22], to:[1,19],  element:'Jord',   mod:'Kardinal' },
+  { key:'aquarius',   name:'Vattumannen',sym:'♒', from:[1,20],  to:[2,18],  element:'Luft',   mod:'Fast' },
+  { key:'pisces',     name:'Fiskarna',   sym:'♓', from:[2,19],  to:[3,20],  element:'Vatten', mod:'Rörlig' },
+  { key:'aries',      name:'Väduren',    sym:'♈', from:[3,21],  to:[4,19],  element:'Eld',    mod:'Kardinal' },
+  { key:'taurus',     name:'Oxen',       sym:'♉', from:[4,20],  to:[5,20],  element:'Jord',   mod:'Fast' },
+  { key:'gemini',     name:'Tvillingarna',sym:'♊',from:[5,21],  to:[6,20],  element:'Luft',   mod:'Rörlig' },
+  { key:'cancer',     name:'Kräftan',    sym:'♋', from:[6,21],  to:[7,22],  element:'Vatten', mod:'Kardinal' },
+  { key:'leo',        name:'Lejonet',    sym:'♌', from:[7,23],  to:[8,22],  element:'Eld',    mod:'Fast' },
+  { key:'virgo',      name:'Jungfrun',   sym:'♍', from:[8,23],  to:[9,22],  element:'Jord',   mod:'Rörlig' },
+  { key:'libra',      name:'Vågen',      sym:'♎', from:[9,23],  to:[10,22], element:'Luft',   mod:'Kardinal' },
+  { key:'scorpio',    name:'Skorpionen', sym:'♏', from:[10,23], to:[11,21], element:'Vatten', mod:'Fast' },
+  { key:'sagittarius',name:'Skytten',    sym:'♐', from:[11,22], to:[12,21], element:'Eld',    mod:'Rörlig' },
+];
+function zodiacIndex(m, d) {
+  for (let i = 0; i < 12; i++) {
+    const z = ZODIAC[i];
+    if (z.from[0] === 12) { // Capricorn wraps
+      if ((m === 12 && d >= 22) || (m === 1 && d <= 19)) return i;
+    } else if ((m === z.from[0] && d >= z.from[1]) || (m === z.to[0] && d <= z.to[1])) return i;
+  }
+  return 0;
+}
+// Degree around the zodiac wheel 0..360 (Aries 0°) for constellation placement
+function zodiacDegree(m, d) {
+  const start = new Date(2001, 2, 21); // Mar 21
+  let t = new Date(2001, m - 1, d);
+  if (t < start) t = new Date(2002, m - 1, d);
+  return ((t - start) / 864e5) / 365 * 360;
+}
+
+// ---------- Chinese zodiac (solar calendar, year begins ~4 Feb / lichun) ----------
+const ANIMALS = ['Råttan','Oxen','Tigern','Kaninen','Draken','Ormen','Hästen','Geten','Apan','Tuppen','Hunden','Grisen'];
+const ANIMAL_EMOJI = ['🐀','🐂','🐅','🐇','🐉','🐍','🐎','🐐','🐒','🐓','🐕','🐖'];
+const CN_ELEMENTS = ['Trä','Eld','Jord','Metall','Vatten'];
+function chineseYear(y, m, d) { return (m === 1 || (m === 2 && d < 4)) ? y - 1 : y; }
+function chineseZodiac(y, m, d) {
+  const cy = chineseYear(y, m, d);
+  const animal = ((cy - 4) % 12 + 12) % 12;
+  const stem = ((cy - 4) % 10 + 10) % 10;
+  return { animalIdx: animal, animal: ANIMALS[animal], emoji: ANIMAL_EMOJI[animal],
+           element: CN_ELEMENTS[Math.floor(stem / 2)], yin: stem % 2 === 1, year: cy };
+}
+const TRINES = [[0,4,8],[1,5,9],[2,6,10],[3,7,11]];
+const CLASHES = [[0,6],[1,7],[2,8],[3,9],[4,10],[5,11]];
+
+// ---------- Biorhythm ----------
+const CYCLES = { fysisk: 23, emotionell: 28, intellektuell: 33 };
+function daysAlive(birth, at) {
+  const b = Date.UTC(birth.year, birth.month - 1, birth.day);
+  const t = Date.UTC(at.getFullYear(), at.getMonth(), at.getDate());
+  return Math.round((t - b) / 864e5);
+}
+function biorhythm(birth, at) {
+  const n = daysAlive(birth, at);
+  const val = c => Math.sin(2 * Math.PI * n / c);
+  return { n, fysisk: val(23), emotionell: val(28), intellektuell: val(33) };
+}
+// Phase sync between two people for one cycle: 100% = identical phase
+function cycleSync(nA, nB, cycle) {
+  const diff = ((nA - nB) % cycle + cycle) % cycle;
+  const phase = Math.min(diff, cycle - diff) / (cycle / 2); // 0..1
+  return Math.round((1 - phase) * 100);
+}
+
+// ---------- Signature profile (5 dimensions, 0-100, deterministic & explainable) ----------
+const DIMS = ['Drivkraft','Känsla','Tanke','Stabilitet','Utstrålning'];
+const ELEMENT_BASE = {
+  'Eld':    [82, 56, 50, 42, 80],
+  'Jord':   [58, 52, 62, 86, 50],
+  'Luft':   [60, 50, 84, 46, 68],
+  'Vatten': [50, 86, 58, 56, 56],
+};
+const LP_MOD = { // life path -> dimension deltas
+  1:[14,-4,2,0,8], 2:[-6,12,2,6,-2], 3:[4,6,4,-8,14], 4:[0,-6,6,16,-6], 5:[10,2,6,-10,10],
+  6:[-2,12,-2,10,4], 7:[-6,2,16,4,-8], 8:[14,-6,6,8,4], 9:[0,10,4,-2,8],
+  11:[2,14,10,-6,10], 22:[10,0,10,14,2], 33:[0,16,4,8,10],
+};
+const TRINE_MOD = [ [6,-2,4,0,4], [0,-2,2,8,0], [8,4,-2,-4,6], [-4,8,2,2,2] ]; // per trine group
+function signature(elementName, lp, animalIdx, birthdayNum) {
+  const base = ELEMENT_BASE[elementName].slice();
+  const lpm = LP_MOD[lp] || [0,0,0,0,0];
+  const trine = TRINES.findIndex(t => t.includes(animalIdx));
+  const tm = TRINE_MOD[trine];
+  const bd = reduce(birthdayNum, false);
+  return base.map((v, i) => {
+    let x = v + lpm[i] + tm[i] + ((bd + i) % 3 - 1) * 3;
+    return Math.max(15, Math.min(98, Math.round(x)));
+  });
+}
+
+// ---------- Compatibility ----------
+const ELEMENT_PAIR = {
+  'Eld|Eld':84,'Jord|Jord':82,'Luft|Luft':83,'Vatten|Vatten':85,
+  'Eld|Luft':90,'Luft|Eld':90,'Jord|Vatten':89,'Vatten|Jord':89,
+  'Eld|Jord':58,'Jord|Eld':58,'Luft|Vatten':56,'Vatten|Luft':56,
+  'Eld|Vatten':48,'Vatten|Eld':48,'Jord|Luft':52,'Luft|Jord':52,
+};
+function lpAffinity(a, b) {
+  const ra = reduce(a, false), rb = reduce(b, false);
+  if (ra === rb) return 78;
+  const pairs = { '1|5':88,'1|7':82,'2|6':90,'2|8':84,'3|5':86,'3|9':88,'4|8':87,'4|6':82,'6|9':89,'7|9':80,'1|9':76,'2|4':80,'3|6':82,'5|7':79,'1|8':70,'2|7':72,'3|4':58,'4|5':55,'1|4':60,'5|6':62,'7|8':64,'2|9':74,'8|9':73,'1|2':68,'1|3':75,'1|6':66,'2|3':71,'2|5':60,'3|7':70,'3|8':63,'4|7':77,'4|9':65,'5|8':72,'5|9':69,'6|7':61,'6|8':67 };
+  return pairs[`${Math.min(ra,rb)}|${Math.max(ra,rb)}`] ?? 65;
+}
+function chineseAffinity(ai, bi) {
+  if (ai === bi) return 74;
+  const sameTrine = TRINES.some(t => t.includes(ai) && t.includes(bi));
+  if (sameTrine) return 92;
+  const clash = CLASHES.some(([x,y]) => (x===ai&&y===bi)||(x===bi&&y===ai));
+  if (clash) return 38;
+  // "secret friends" (liu he) pairs
+  const liuhe = [[0,1],[2,11],[3,10],[4,9],[5,8],[6,7]];
+  if (liuhe.some(([x,y]) => (x===ai&&y===bi)||(x===bi&&y===ai))) return 86;
+  return 64;
+}
+function signatureSimilarity(sa, sb) { // 0-100, 100 = identical shape
+  let d = 0;
+  for (let i = 0; i < 5; i++) d += Math.abs(sa[i] - sb[i]);
+  return Math.max(0, Math.round(100 - d / 5 * 1.4));
+}
+function compatibility(A, B) { // A,B are computed profiles
+  const el = ELEMENT_PAIR[`${A.zodiac.element}|${B.zodiac.element}`];
+  const cn = chineseAffinity(A.chinese.animalIdx, B.chinese.animalIdx);
+  const lp = lpAffinity(A.lifePath, B.lifePath);
+  const sim = signatureSimilarity(A.signature, B.signature);
+  const score = Math.round(el * 0.34 + cn * 0.30 + lp * 0.24 + sim * 0.12);
+  return { score, el, cn, lp, sim };
+}
+
+// ---------- Full profile ----------
+function computeProfile(person, at = new Date()) {
+  const { year, month, day } = person;
+  const zi = zodiacIndex(month, day);
+  const z = ZODIAC[zi];
+  const ch = chineseZodiac(year, month, day);
+  const lp = lifePath(year, month, day);
+  const bd = birthdayNumber(day);
+  const py = personalYear(month, day, at.getFullYear());
+  const nn = nameNumber(person.name);
+  const sig = signature(z.element, lp, ch.animalIdx, day);
+  const bio = biorhythm({ year, month, day }, at);
+  const weekday = ['söndag','måndag','tisdag','onsdag','torsdag','fredag','lördag'][new Date(year, month-1, day).getDay()];
+  return { ...person, zodiacIdx: zi, zodiac: z, chinese: ch, lifePath: lp, birthdayNum: bd,
+           personalYear: py, nameNum: nn, signature: sig, bio, weekday,
+           degree: zodiacDegree(month, day) };
+}
+
+return { luhnCheck, parsePersonnummer, parseBirthdate, reduce, lifePath, birthdayNumber,
+         personalYear, nameNumber, ZODIAC, zodiacIndex, zodiacDegree, ANIMALS, ANIMAL_EMOJI,
+         chineseZodiac, chineseYear, TRINES, CLASHES, CYCLES, daysAlive, biorhythm, cycleSync,
+         DIMS, signature, compatibility, computeProfile, signatureSimilarity };
+})();
+Object.assign(window, KE);
+
+/* Six digits YYMMDD -> birth date. Century inferred (<= current yy => 20xx), flippable when ambiguous. */
+function parseSixDigits(str,century){
+  const d=String(str||'').replace(/\D/g,'');
+  if(d.length!==6) return {ok:false,error:'format'};
+  const yy=+d.slice(0,2), mm=+d.slice(2,4), dd=+d.slice(4,6);
+  const nowYY=new Date().getFullYear()%100;
+  const ambiguous=yy<=nowYY;
+  let year=century?(century+yy):(ambiguous?2000+yy:1900+yy);
+  if(mm<1||mm>12) return {ok:false,error:'date'};
+  const dim=new Date(year,mm,0).getDate();
+  if(dd<1||dd>dim) return {ok:false,error:'date'};
+  if(new Date(year,mm-1,dd)>new Date()) return {ok:false,error:'future'};
+  return {ok:true,year,month:mm,day:dd,ambiguous,six:d};
+}
+
+/* ================= CONTENT (svenska tolkningar) ================= */
+const C = {};
+C.lifePath = {
+1:{title:'Pionjären',text:'Ditt livstal pekar mot självständighet och initiativ. Du trivs bäst när du får gå först, öppna dörrar och sätta riktningen — och du blir rastlös när någon annan håller i kartan. Din väg handlar om att våga lita på din egen kompass.',styrkor:['Initiativ','Mod','Egen riktning'],friktion:'Otålighet när andra tvekar — och svårt att be om hjälp.'},
+2:{title:'Diplomaten',text:'Tvåan är samspelets tal. Du läser rum, känner av stämningar och bygger broar där andra ser murar. Din styrka är sällan högljudd, men det är ofta du som får helheten att hålla ihop. Din väg handlar om att värdesätta din lyhördhet utan att tappa bort din egen röst.',styrkor:['Lyhördhet','Samarbete','Taktkänsla'],friktion:'Konflikträdsla — du jämkar ibland bort dig själv.'},
+3:{title:'Berättaren',text:'Trean bär uttryckets energi. Idéer, ord och bilder rör sig lätt genom dig, och du får ofta andra att se världen lite ljusare. Din väg handlar om att ta din kreativitet på allvar — att göra klart, inte bara börja briljant.',styrkor:['Kreativitet','Humor','Uttryck'],friktion:'Spridd energi — många öppna trådar, få knutna.'},
+4:{title:'Byggaren',text:'Fyran är fundamentets tal. Du skapar ordning, struktur och sådant som håller över tid. När andra improviserar bygger du system — och det är ofta ditt arbete som står kvar när dammet lagt sig. Din väg handlar om att låta stabilitet vara en styrka utan att den blir en bur.',styrkor:['Uthållighet','Struktur','Pålitlighet'],friktion:'Svårt med plötsliga kast och halvfärdiga planer.'},
+5:{title:'Utforskaren',text:'Femman är rörelsens och frihetens tal. Du behöver variation, nya intryck och rum att svänga i — rutin i för stora doser släcker din låga. Din väg handlar om att hitta frihet med riktning: äventyr som bygger något, inte bara flykt framåt.',styrkor:['Anpassningsförmåga','Nyfikenhet','Energi'],friktion:'Rastlöshet när vardagen blir för förutsägbar.'},
+6:{title:'Vårdaren',text:'Sexan är omsorgens och ansvarets tal. Människor söker sig till dig när det blåser, och du har en sällsynt förmåga att skapa trygghet och skönhet omkring dig. Din väg handlar om att ge utan att glömma att också ta emot.',styrkor:['Omsorg','Ansvar','Harmoni'],friktion:'Tar på dig andras bördor tills ryggen viker sig.'},
+7:{title:'Sökaren',text:'Sjuan är djupets tal. Du nöjer dig inte med ytan — du vill förstå hur saker egentligen hänger ihop, och du behöver egen tid för att tänka klart. Din väg handlar om att lita på ditt inre vetande och ändå våga dela det med världen.',styrkor:['Analys','Intuition','Integritet'],friktion:'Drar dig undan när du egentligen behöver närhet.'},
+8:{title:'Strategen',text:'Åttan bär kraftens och resultatets energi. Du tänker i helheter, förstår resurser och drivs av att få saker att växa — projekt, verksamheter, människor. Din väg handlar om att använda din kraft för något större än poängtavlan.',styrkor:['Genomförandekraft','Överblick','Ambition'],friktion:'Mäter ibland värde i resultat — även ditt eget.'},
+9:{title:'Humanisten',text:'Nian är helhetens och medkänslans tal. Du ser mönster över gränser, berörs av det stora och har lätt att ge vidare av det du kan. Din väg handlar om att avsluta cykler med värdighet — att släppa taget är din form av visdom.',styrkor:['Medkänsla','Perspektiv','Generositet'],friktion:'Idealism som krockar med världens tröghet.'},
+11:{title:'Visionären · mästartal',text:'Elvan är ett mästartal — en förstärkt tvåa med antenner utåt och uppåt. Du fångar stämningar och idéer innan de fått ord, och kan inspirera andra nästan utan att försöka. Din väg handlar om att jorda din känslighet så att visionerna får fäste i verkligheten.',styrkor:['Intuition','Inspiration','Idérikedom'],friktion:'Högspänning: känsligheten kan slå över i oro.'},
+22:{title:'Mästerbyggaren · mästartal',text:'Tjugotvån kallas mästerbyggaren — fyrans struktur i stor skala. Du kan hålla både visionen och ritningen samtidigt, och det du bygger är tänkt att vara kvar länge. Din väg handlar om tålamod: stora verk reser sig långsamt.',styrkor:['Vision + struktur','Uthållighet','Verkshöjd'],friktion:'Kraven på dig själv kan bli omänskliga.'},
+33:{title:'Läraren · mästartal',text:'Trettiotre är det sällsynta hjärtats tal — sexans omsorg lyft till princip. Du verkar genom att visa, inte peka, och människor växer i din närhet. Din väg handlar om att vårda källan du öser ur.',styrkor:['Vägledning','Värme','Närvaro'],friktion:'Ger tills det tar — gränser är din läxa.'}
+};
+C.zodiac = {
+capricorn:{text:'Stenbocken klättrar metodiskt och tänker i decennier. Du bär ett tyst allvar och en torr humor, och du levererar när andra pratar.',styrkor:['Disciplin','Långsiktighet','Torr humor'],friktion:'Släpper sällan in någon bakom fasaden.'},
+aquarius:{text:'Vattumannen tänker i system och framtider. Du är samhällets vän men gruppens fritänkare — nära, men alltid med ett eget luftlager.',styrkor:['Originalitet','Idealism','Överblick'],friktion:'Distans när det blir för känslosamt.'},
+pisces:{text:'Fiskarna rör sig mellan världar. Du känner det osagda i ett rum, drömmer på riktigt och har konstnärens genomsläpplighet.',styrkor:['Empati','Fantasi','Följsamhet'],friktion:'Flyter iväg när verkligheten skaver.'},
+aries:{text:'Väduren är zodiakens startskott. Du tänder snabbt, går rakt på och har en ärlighet som både röjer väg och river i.',styrkor:['Mod','Tempo','Rakhet'],friktion:'Tålamod är inte din hemmaplan.'},
+taurus:{text:'Oxen bygger långsamt och njuter ordentligt. Du står stadigt när det stormar och har en lojalitet man kan bygga hus på.',styrkor:['Stabilitet','Sinnlighet','Lojalitet'],friktion:'Envisheten kan bli en parkeringsbroms.'},
+gemini:{text:'Tvillingarna lever genom samtal och rörelse. Du är nyfikenheten personifierad — snabb i tanken, kvick i repliken, alltid med två fönster öppna.',styrkor:['Kvickhet','Nyfikenhet','Social lätthet'],friktion:'Djup kräver att du stannar kvar.'},
+cancer:{text:'Kräftan bär hemmet med sig. Du minns, vårdar och skyddar — och bakom skalet finns zodiakens mjukaste kärna.',styrkor:['Omtanke','Minne','Intuition'],friktion:'Drar dig in i skalet i stället för att säga ifrån.'},
+leo:{text:'Lejonet bär en inre scen och ett stort hjärta. Du ger värme och generositet — och mår bäst när den ses och besvaras.',styrkor:['Värme','Generositet','Utstrålning'],friktion:'Stoltheten tål inte att bli förbisedd.'},
+virgo:{text:'Jungfrun ser det andra missar. Du förbättrar tyst och tjänar gärna — precision är ditt kärleksspråk.',styrkor:['Precision','Omtänksam praktik','Analys'],friktion:'Det kritiska ögat vänds oftast inåt.'},
+libra:{text:'Vågen söker jämvikt och skönhet. Du är född medlare med känsla för form — och vägen till beslut går via alla perspektiv.',styrkor:['Diplomati','Estetik','Rättvisa'],friktion:'Att välja är att välja bort — det gör ont.'},
+scorpio:{text:'Skorpionen lever på djupet. Du ser igenom det mesta, glömmer sällan och älskar utan halvmesyrer.',styrkor:['Intensitet','Skarpsyn','Lojalitet'],friktion:'Kontrollbehovet släpper ogärna taget.'},
+sagittarius:{text:'Skytten siktar mot horisonten. Du behöver mening och rörelse, och din optimism är på riktigt smittsam.',styrkor:['Optimism','Ärlighet','Vidsyn'],friktion:'Sanningen levereras ibland utan emballage.'}
+};
+C.animals = {
+0:{text:'Råttan är kvicktänkt, charmig och överlevare av rang — ser möjligheter där andra ser stängda dörrar.',ord:'Klipsk & resursstark'},
+1:{text:'Oxen arbetar tåligt och lovar sällan mer än den håller. Styrka utan åthävor.',ord:'Trygg & uthållig'},
+2:{text:'Tigern går på instinkt och mod — en ledare som hellre ber om förlåtelse än om lov.',ord:'Modig & magnetisk'},
+3:{text:'Kaninen är taktfull, estetisk och diplomatisk — vinner rummet utan att höja rösten.',ord:'Följsam & elegant'},
+4:{text:'Draken är det enda mytiska djuret i kretsen: stor energi, stora visioner, stor scen.',ord:'Karismatisk & driven'},
+5:{text:'Ormen är vis, avvaktande och djup — säger lite, ser allt.',ord:'Vis & gåtfull'},
+6:{text:'Hästen är fri, social och snabbfotad — trivs i rörelse och tappar glansen i stallet.',ord:'Fri & energisk'},
+7:{text:'Geten är konstnärlig, mjuk och fredsälskande — skapar skönhet och söker trygga flockar.',ord:'Kreativ & varm'},
+8:{text:'Apan är listig, lekfull och löser det olösliga — helst med publik.',ord:'Fyndig & rörlig'},
+9:{text:'Tuppen är noggrann, stolt och rakryggad — säger det som behöver sägas, i tid.',ord:'Skarp & stolt'},
+10:{text:'Hunden är lojaliteten själv: rättvis, vaksam och orubblig när det gäller de sina.',ord:'Lojal & ärlig'},
+11:{text:'Grisen är generös, njutningsklok och godhjärtad — den vän alla önskar att de hade.',ord:'Generös & äkta'}
+};
+C.cnElement = {
+'Trä':'Trä växer: idéer, expansion och nybörjarens friska mod.',
+'Eld':'Eld lyser: passion, synlighet och smittande energi.',
+'Jord':'Jord bär: stabilitet, omsorg och praktisk klokskap.',
+'Metall':'Metall skär: precision, viljestyrka och klara linjer.',
+'Vatten':'Vatten söker vägen: intuition, djup och anpassning.'};
+C.personalYear = {
+1:{tema:'Nystart',text:'Ett år för att så. Påbörja det du skjutit upp — frön satta nu växer i nio år.'},
+2:{tema:'Tålamod & relationer',text:'Ett år för att låta det sådda rota sig. Samarbeten och tajming avgör mer än kraft.'},
+3:{tema:'Uttryck',text:'Ett år för att synas och skapa. Din röst bär längre än vanligt — använd den.'},
+4:{tema:'Grundarbete',text:'Ett år för struktur och hantverk. Det tråkiga du gör nu blir din stabilaste tillgång.'},
+5:{tema:'Förändring',text:'Ett år då dörrar byts. Var rörlig — det oväntade är årets läroplan.'},
+6:{tema:'Ansvar & hem',text:'Ett år där relationer, hem och åtaganden står i centrum. Att vårda är att växa.'},
+7:{tema:'Insikt',text:'Ett inåtvänt år. Studera, reflektera, förfina — svaren kommer i tystnaden.'},
+8:{tema:'Skörd & kraft',text:'Ett år av resultat. Det du byggt vill betala tillbaka — kliv fram och ta plats.'},
+9:{tema:'Avslut',text:'Ett år för att knyta ihop och släppa taget. Rensa ur — nästa cykel behöver plats.'}};
+C.nameNum = {1:'som en självgående ledargestalt',2:'som en lyssnande brobyggare',3:'som en färgstark berättare',4:'som en pålitlig klippa',5:'som en rörlig fritänkare',6:'som en varm samlingspunkt',7:'som en tänkare med integritet',8:'som en kraftfull genomförare',9:'som en generös världsmedborgare',11:'som en inspiratör med antenner',22:'som en byggare av stora ting',33:'som en sällsynt varm vägledare'};
+C.dims = [
+{k:'Drivkraft',d:'vilja framåt, initiativ'},{k:'Känsla',d:'emotionellt djup, empati'},{k:'Tanke',d:'analys, idéer, språk'},
+{k:'Stabilitet',d:'uthållighet, lugn'},{k:'Utstrålning',d:'social energi, närvaro'}];
+C.elPair = {
+'Eld|Luft':'Eld och luft göder varandra — luften ger elden syre, elden ger luften riktning. En dynamisk, framåtlutad kombination.',
+'Jord|Vatten':'Vatten ger jorden liv och jorden ger vattnet form. En närande, trygg kombination som växer långsamt och håller länge.',
+'Eld|Eld':'Två eldar: hög värme, högt tempo — festligt och kraftfullt så länge ingen tävlar om syret.',
+'Jord|Jord':'Två jordtecken: gemensam grund, gemensam takt. Ovanligt stabilt — passa bara på att öppna fönstren ibland.',
+'Luft|Luft':'Två lufttecken: samtal utan slut och idéer i fri flykt. Se bara till att någon då och då landar planet.',
+'Vatten|Vatten':'Två vatten: ordlös förståelse och stort djup. Vackert — och emellanåt en hel del väder.',
+'Eld|Jord':'Eld möter jord: den ena vill nu, den andra vill rätt. Med respekt blir det glödgat hantverk; utan blir det bromsspår.',
+'Luft|Vatten':'Luft möter vatten: tanke möter känsla. Ni ser samma sak från varsitt element — översättningen är er uppgift.',
+'Eld|Vatten':'Eld möter vatten: ånga eller släckning. Stark attraktion och stark friktion — dosering är allt.',
+'Jord|Luft':'Jord möter luft: det konkreta möter det abstrakta. Ni kompletterar varandra när ni slutar kräva att den andra ska byta element.'};
+function elPairText(a,b){ return C.elPair[a+'|'+b] || C.elPair[b+'|'+a]; }
+C.scoreBand = s => s>=85?['Stjärnpar','Ovanligt stark resonans — era mönster förstärker varandra.']:
+ s>=72?['Stark länk','Mycket gemensam våglängd, med lagom mycket gnista i skillnaderna.']:
+ s>=58?['Dynamisk duo','Både medvind och friktion — kontrasterna är er energikälla, om ni låter dem vara det.']:
+ ['Kontrastpar','Ni är varandras motpoler i flera system. Krävande — och därför lärorikt.'];
+C.cnRelation = (ai,bi)=>{
+  if(ai===bi) return ['Samma djur','Ni delar årsdjur — samma instinkter, samma blinda fläckar.'];
+  if(TRINES.some(t=>t.includes(ai)&&t.includes(bi))) return ['Samma triangel','Era årsdjur hör till samma harmoniska triangel — en klassisk vänskapsallians i kinesisk tradition.'];
+  if(CLASHES.some(([x,y])=>(x===ai&&y===bi)||(x===bi&&y===ai))) return ['Motstående djur','Era årsdjur står mittemot varandra på zodiakhjulet — traditionens klassiska spänningspar. Friktion, men aldrig tråkigt.'];
+  const liuhe=[[0,1],[2,11],[3,10],[4,9],[5,8],[6,7]];
+  if(liuhe.some(([x,y])=>(x===ai&&y===bi)||(x===bi&&y===ai))) return ['Hemliga vänner','Era årsdjur är ett av de sex "hemliga vän"-paren — ett tyst, starkt band enligt traditionen.'];
+  return ['Neutrala grannar','Era årsdjur varken krockar eller förstärker varandra — relationen formas av annat.'];
+};
+C.weekdayLore = {måndag:'månens dag — känslans barn',tisdag:'Tyrs dag — kämpens dag',onsdag:'Odens dag — tankens dag',torsdag:'Tors dag — kraftens dag',fredag:'Frejas dag — kärlekens dag',lördag:'tvagningens dag — förnyelsens dag',söndag:'solens dag — ljusets dag'};
+
+/* ================= STORAGE ================= */
+const SKEY='konstellation.v1';
+async function loadState(){
+  try{ if(window.storage){ const r=await window.storage.get(SKEY); if(r&&r.value) return JSON.parse(r.value); } }catch(e){}
+  try{ const r=localStorage.getItem(SKEY); if(r) return JSON.parse(r); }catch(e){}
+  return null;
+}
+let saveTimer=null;
+function saveState(){
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(async()=>{
+    const json=JSON.stringify(S);
+    try{ if(window.storage){ await window.storage.set(SKEY,json); return; } }catch(e){}
+    try{ localStorage.setItem(SKEY,json); }catch(e){}
+  },250);
+}
+
+/* ================= STATE & SEED ================= */
+let S=null; // {me, people:[], groups:[]}
+const uid=()=>Math.random().toString(36).slice(2,9);
+const SEED_GROUPS=[{id:'g_fam',name:'Familj',emoji:'🏡'},{id:'g_van',name:'Vänner',emoji:'✨'},{id:'g_jobb',name:'Jobb',emoji:'💼'},{id:'g_golf',name:'Golf',emoji:'⛳'}];
+const SEED_PEOPLE=[
+ {name:'Astrid Lindberg',year:1956,month:4,day:28,plus4:'1245',groups:['g_fam'],demo:1},
+ {name:'Lars Öhman',year:1960,month:5,day:4,plus4:'0933',groups:['g_fam','g_golf'],demo:1},
+ {name:'Elin Dahl',year:1999,month:12,day:5,groups:['g_fam'],demo:1},
+ {name:'Maria Holm',year:1991,month:6,day:25,plus4:'4486',groups:['g_van'],demo:1},
+ {name:'Johan Ek',year:1984,month:3,day:25,groups:['g_van','g_golf'],demo:1},
+ {name:'Sofia Bergqvist',year:1996,month:2,day:2,groups:['g_van'],demo:1},
+ {name:'Erik Sandström',year:1988,month:10,day:9,plus4:'2711',groups:['g_jobb','g_van'],demo:1},
+ {name:'Karin Nyström',year:1979,month:11,day:21,groups:['g_jobb'],demo:1},
+ {name:'Peter Wallin',year:1975,month:9,day:6,plus4:'6598',groups:['g_golf'],demo:1},
+];
+const DEMO_SCAN={name:'Vera Lund',year:1993,month:9,day:14,plus4:'6281'};
+
+/* ================= HELPERS ================= */
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const MONTHS=['januari','februari','mars','april','maj','juni','juli','augusti','september','oktober','november','december'];
+const fmtDate=p=>`${p.day} ${MONTHS[p.month-1]} ${p.year}`;
+const elColor=e=>({Eld:'var(--eld)',Jord:'var(--jord)',Luft:'var(--luft)',Vatten:'var(--vatten)'}[e]);
+const initials=n=>n.trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase();
+const NOW=()=>new Date();
+function prof(p){ return computeProfile(p, NOW()); }
+function meProf(){ return prof(S.me); }
+function personById(id){ return S.people.find(p=>p.id===id); }
+function groupById(id){ return S.groups.find(g=>g.id===id); }
+function membersOf(gid){ return S.people.filter(p=>p.groups.includes(gid)); }
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),2300); }
+function firstName(n){ return (n||'').trim().split(/\s+/)[0]; }
+
+/* --- share code --- */
+function b64e(s){ return btoa(unescape(encodeURIComponent(s))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); }
+function b64d(s){ s=s.replace(/-/g,'+').replace(/_/g,'/'); while(s.length%4)s+='='; return decodeURIComponent(escape(atob(s))); }
+function shareCode(p){ const a=[p.name,`${p.year}${String(p.month).padStart(2,'0')}${String(p.day).padStart(2,'0')}`]; if(p.plus4)a.push(p.plus4); return 'KON1.'+b64e(JSON.stringify(a)); }
+function parseShareCode(code){
+  try{
+    const m=(code||'').trim().match(/KON1\.([A-Za-z0-9_-]+)/); if(!m) return null;
+    const [name,ymd,p4]=JSON.parse(b64d(m[1]));
+    const year=+ymd.slice(0,4),month=+ymd.slice(4,6),day=+ymd.slice(6,8);
+    const chk=parseBirthdate(year,month,day); if(!chk.ok||!name) return null;
+    const out={name:String(name).slice(0,60),year,month,day};
+    if(typeof p4==='string'&&/^\d{4}$/.test(p4))out.plus4=p4;
+    return out;
+  }catch(e){ return null; }
+}
+
+/* ================= SVG BUILDERS ================= */
+function svgRadar(sigs,size=230,opts={}){ // sigs: [{values,color,fill}]
+  const cx=size/2, cy=size/2+4, R=size/2-36, N=5;
+  const pt=(i,r)=>{const a=-Math.PI/2+i*2*Math.PI/N;return [cx+r*Math.cos(a),cy+r*Math.sin(a)];};
+  let s=`<svg viewBox="0 0 ${size} ${size+6}" width="100%" role="img" aria-label="Signaturdiagram">`;
+  for(const f of [.33,.66,1]){ s+=`<polygon points="${[...Array(N)].map((_,i)=>pt(i,R*f).join(',')).join(' ')}" fill="none" stroke="rgba(160,175,210,.14)" stroke-width="1"/>`; }
+  for(let i=0;i<N;i++){ const [x,y]=pt(i,R); s+=`<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="rgba(160,175,210,.1)"/>`; }
+  for(const g of sigs){
+    const pts=g.values.map((v,i)=>pt(i,R*v/100).join(',')).join(' ');
+    s+=`<polygon points="${pts}" fill="${g.fill}" stroke="${g.color}" stroke-width="1.8" stroke-linejoin="round"/>`;
+    for(let i=0;i<N;i++){const [x,y]=pt(i,R*g.values[i]/100);s+=`<circle cx="${x}" cy="${y}" r="2.6" fill="${g.color}"/>`;}
+  }
+  const labs=C.dims.map(d=>d.k);
+  for(let i=0;i<N;i++){ const [x,y]=pt(i,R+19); s+=`<text x="${x}" y="${y+3}" text-anchor="middle" font-size="10" letter-spacing=".05em" fill="#8E96AE" font-family="Sora,sans-serif">${labs[i]}</text>`; }
+  return s+'</svg>';
+}
+function svgBio(birth,days=15,W=352,H=150){
+  const today=NOW(); const n0=daysAlive(birth,today);
+  const cols={fysisk:'var(--eld)',emotionell:'var(--vatten)',intellektuell:'var(--luft)'};
+  const X=d=>18+( (d+days)/(2*days) )*(W-32), Y=v=>H/2-(v*(H/2-20));
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Biorytmkurvor">
+  <line x1="14" y1="${H/2}" x2="${W-14}" y2="${H/2}" stroke="rgba(160,175,210,.18)" stroke-dasharray="2 4"/>
+  <line x1="${X(0)}" y1="14" x2="${X(0)}" y2="${H-14}" stroke="rgba(232,199,118,.4)"/>
+  <text x="${X(0)}" y="11" text-anchor="middle" font-size="9" fill="var(--gold)" font-family="Sora" letter-spacing=".1em">IDAG</text>
+  <text x="16" y="${H-4}" font-size="9" fill="#5B6379" font-family="Sora">−${days} dagar</text>
+  <text x="${W-16}" y="${H-4}" text-anchor="end" font-size="9" fill="#5B6379" font-family="Sora">+${days}</text>`;
+  for(const [key,cyc] of Object.entries(CYCLES)){
+    let d='';
+    for(let x=-days;x<=days;x+=0.5){ const v=Math.sin(2*Math.PI*(n0+x)/cyc); d+=(x===-days?'M':'L')+X(x).toFixed(1)+' '+Y(v).toFixed(1)+' '; }
+    s+=`<path d="${d}" fill="none" stroke="${cols[key]}" stroke-width="1.8" opacity=".9"/>`;
+    const v0=Math.sin(2*Math.PI*n0/cyc);
+    s+=`<circle cx="${X(0)}" cy="${Y(v0)}" r="3.4" fill="${cols[key]}"/>`;
+  }
+  return s+'</svg>';
+}
+function svgDial(score,color='var(--gold)'){
+  const r=62,c=2*Math.PI*r,off=c*(1-score/100);
+  return `<svg width="150" height="150" viewBox="0 0 150 150">
+  <circle cx="75" cy="75" r="${r}" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="9"/>
+  <circle cx="75" cy="75" r="${r}" fill="none" stroke="${color}" stroke-width="9" stroke-linecap="round"
+    stroke-dasharray="${c}" stroke-dashoffset="${off}" style="transition:stroke-dashoffset 1s cubic-bezier(.2,.8,.2,1)"/></svg>`;
+}
+/* Constellation of the circle */
+function svgConstellation(people,filterIds){
+  const W=380,H=330,cx=W/2,cy=H/2+6,R=126;
+  const me=meProf();
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" style="touch-action:manipulation">`;
+  // faint zodiac ring + season ticks
+  s+=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="rgba(160,175,210,.12)" stroke-dasharray="1 5"/>`;
+  const active=p=>!filterIds||filterIds.has(p.id);
+  const placed=people.map(p=>{
+    const pr=prof(p), a=(pr.degree-90)*Math.PI/180;
+    return {p,pr,x:cx+R*Math.cos(a),y:cy+R*Math.sin(a),comp:compatibility(me,pr).score};
+  });
+  // lines me->person
+  for(const q of placed){
+    const on=active(q.p), op=on?(0.12+q.comp/100*.55):.05;
+    s+=`<line x1="${cx}" y1="${cy}" x2="${q.x}" y2="${q.y}" stroke="var(--gold)" stroke-width="${on?1:0.6}" opacity="${op.toFixed(2)}"/>`;
+  }
+  // lines between same-group strong pairs (subtle web)
+  for(let i=0;i<placed.length;i++)for(let j=i+1;j<placed.length;j++){
+    const a=placed[i],b=placed[j];
+    if(!active(a.p)||!active(b.p))continue;
+    const sc=compatibility(a.pr,b.pr).score;
+    if(sc>=80) s+=`<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="var(--vatten)" stroke-width=".7" opacity=".22"/>`;
+  }
+  // me star
+  s+=`<g><circle cx="${cx}" cy="${cy}" r="13" fill="rgba(232,199,118,.14)"/><circle cx="${cx}" cy="${cy}" r="5.5" fill="var(--gold)"/>
+      <circle cx="${cx}" cy="${cy}" r="9" fill="none" stroke="var(--gold)" opacity=".5"/>
+      <text x="${cx}" y="${cy+27}" text-anchor="middle" font-size="10" fill="var(--gold)" font-family="Sora" letter-spacing=".14em">DU</text></g>`;
+  // person stars
+  for(const q of placed){
+    const on=active(q.p), col=elColor(q.pr.zodiac.element), rr=on?(4+q.comp/28):3;
+    s+=`<g class="cstar" data-pid="${q.p.id}" style="cursor:pointer">
+      <circle cx="${q.x}" cy="${q.y}" r="16" fill="transparent"/>
+      <circle cx="${q.x}" cy="${q.y}" r="${rr.toFixed(1)}" fill="${col}" opacity="${on?.95:.28}">${on?`<animate attributeName="opacity" values=".95;.6;.95" dur="${(2.5+q.comp/40).toFixed(1)}s" repeatCount="indefinite"/>`:''}</circle>
+      <text x="${q.x}" y="${q.y-11}" text-anchor="middle" font-size="9.5" fill="${on?'#C7CEE2':'#4A526A'}" font-family="Sora">${esc(firstName(q.p.name))}</text></g>`;
+  }
+  return s+'</svg>';
+}
+
+/* ================= SKY ================= */
+function paintSky(){
+  const cv=$('#sky'),fr=$('#frame');
+  cv.width=fr.clientWidth*2; cv.height=fr.clientHeight*2;
+  const g=cv.getContext('2d'); g.scale(2,2);
+  const W=fr.clientWidth,H=fr.clientHeight;
+  for(let i=0;i<90;i++){
+    const x=Math.random()*W,y=Math.random()*H,r=Math.random()*1.1+.2;
+    g.beginPath();g.arc(x,y,r,0,7);g.fillStyle=`rgba(${200+Math.random()*55|0},${205+Math.random()*40|0},240,${.12+Math.random()*.5})`;g.fill();
+  }
+}
+
+/* ================= ROUTER ================= */
+let TAB='me';
+function go(tab){ TAB=tab; $$('#tabbar .tab').forEach(b=>b.classList.toggle('on',b.dataset.tab===tab)); render(); $('#main').scrollTop=0; }
+function render(){
+  const m=$('#main');
+  if(TAB==='me')m.innerHTML=viewMe();
+  else if(TAB==='circle')m.innerHTML=viewCircle();
+  else if(TAB==='compare')m.innerHTML=viewCompare();
+  else m.innerHTML=viewConnect();
+  bindView(m);
+}
+
+/* ================= VIEW: JAG ================= */
+function pct(v){ return Math.round(v*100); }
+function bioWord(v){ return v>0.5?'hög':v>0.05?'stigande':v>-0.05?'kritisk växling':v>-0.5?'låg':'vilofas'; }
+function bestBioDay(birth){ // next day within 10 days where sum of cycles is max
+  let best={d:0,s:-9};
+  for(let d=0;d<=10;d++){
+    const at=new Date();at.setDate(at.getDate()+d);
+    const b=biorhythm(birth,at),s=b.fysisk+b.emotionell+b.intellektuell;
+    if(s>best.s)best={d,s};
+  }
+  return best.d;
+}
+function viewMe(){
+  const p=meProf(), lp=C.lifePath[p.lifePath], z=C.zodiac[p.zodiac.key], an=C.animals[p.chinese.animalIdx];
+  const py=C.personalYear[p.personalYear];
+  const sig=p.signature, topDim=C.dims[sig.indexOf(Math.max(...sig))], lowDim=C.dims[sig.indexOf(Math.min(...sig))];
+  const bb=bestBioDay(p);
+  const bbTxt=bb===0?'Idag är din bästa dag i närtid — cyklerna samverkar.':`Din starkaste dag i närtid infaller om ${bb} ${bb===1?'dag':'dagar'}, då cyklerna samverkar som mest.`;
+  const six=`${String(p.year%100).padStart(2,'0')}${String(p.month).padStart(2,'0')}${String(p.day).padStart(2,'0')}`;
+  const moon=moonPhase(NOW()), birthMoon=moonPhase(new Date(p.year,p.month-1,p.day,12));
+  const pd=personalDay(p.month,p.day,NOW());
+  const kraft=powerDays(p);
+  const kritiska=criticalDays(p);
+  return `
+  <div class="viewhead"><span class="eyebrow">Din rapport</span><h1>${esc(firstName(p.name))}<span class="serif-i" style="color:var(--gold)">s himmel</span></h1></div>
+  <div class="stagger">
+  <section class="mehero">
+    <div class="zbig">${p.zodiac.sym}</div>
+    <h2 style="font-weight:340;font-size:24px">${esc(p.name)}</h2>
+    <div class="digitband" style="margin:14px 0 2px" aria-label="dina siffror">${six.split('').map((d,i)=>`<span style="animation:fin .5s ${i*0.06}s both">${d}</span>`).join('')}${p.plus4?`<span class="dsep">–</span>${p.plus4.split('').map((d,i)=>`<span class="p4" style="animation:fin .5s ${(6+i)*0.06}s both">${d}</span>`).join('')}`:''}</div>
+    ${!p.plus4?`<button class="p4ghost" id="addPlus4Me">＋ fyra siffror → din djupsignatur</button>`:''}
+    <div class="muted small mt6">Född ${fmtDate(p)} — en ${p.weekday}, ${C.weekdayLore[p.weekday]}.</div>
+    <div class="idrow">
+      <span class="chip mini on">${p.zodiac.sym} ${p.zodiac.name}</span>
+      <span class="chip mini">${p.chinese.emoji} ${p.chinese.element}-${p.chinese.animal.toLowerCase()}</span>
+      <span class="chip mini">Livstal ${p.lifePath}</span>
+      ${p.plus4?`<span class="chip mini" style="border-color:rgba(232,199,118,.4);color:var(--gold)">Djuptal ${deepNumber(p)}</span>`:''}
+    </div>
+  </section>
+
+  <section class="card gold">
+    <span class="eyebrow">Din överblick</span>
+    <div class="insrow" style="padding-top:10px"><span class="ic" style="color:var(--gold);font-family:var(--disp);font-size:19px">${p.lifePath}</span>
+      <p><b>Sex siffror · livstal ${p.lifePath} — ${C.lifePath[p.lifePath].title.replace(' · mästartal','')}.</b> ${C.numTone[p.lifePath][0].toUpperCase()+C.numTone[p.lifePath].slice(1)} är din grundriktning, läst ur hela födelsedatumet.</p></div>
+    ${p.plus4?`<div class="insrow"><span class="ic" style="color:var(--gold);font-family:var(--disp);font-size:19px">${deepNumber(p)}</span>
+      <p><b>Tio siffror · djuptal ${deepNumber(p)}.</b> Ett eget lager ovanpå de sex — undertexten: ${C.numTone[deepNumber(p)]}. Båda analyserna finns i rapporten nedan.</p></div>`
+    :`<div class="insrow"><span class="ic" style="color:var(--faint)">＋4</span>
+      <p><b>Tio siffror — inte upplåst ännu.</b> Fyra valfria siffror till ger dig djuptal och sifferprofil som ett andra lager. <button class="linkish" id="ovAddP4" style="color:var(--gold-dim)">Lägg till</button></p></div>`}
+    <div class="insrow"><span class="ic">〜</span>
+      <p><b>Rytmen idag:</b> kropp ${bioWord(p.bio.fysisk)} (${pct(p.bio.fysisk)}%), känsla ${bioWord(p.bio.emotionell)} (${pct(p.bio.emotionell)}%), tanke ${bioWord(p.bio.intellektuell)} (${pct(p.bio.intellektuell)}%). Tre kroppsegna cykler — 23, 28 och 33 dagar — som pendlar mellan topp och vila. Kurvan finns längre ned.</p></div>
+  </section>
+
+  <section class="card gold">
+    <div class="spread"><span class="eyebrow">Just nu · ${NOW().toLocaleDateString('sv-SE',{day:'numeric',month:'long'})}</span><span class="tag">${C.moon[moon.idx].emoji} ${C.moon[moon.idx].name.toLowerCase()}</span></div>
+    <div class="nowgrid">
+      <div class="nowcell"><b style="color:var(--gold)">${pd}</b><span>Personlig dag</span></div>
+      <div class="nowcell"><b style="color:var(--eld)">${pct(p.bio.fysisk)}%</b><span>Kropp</span></div>
+      <div class="nowcell"><b style="color:var(--vatten)">${pct(p.bio.emotionell)}%</b><span>Känsla</span></div>
+    </div>
+    <div class="nowline"><span class="moonchip">${C.moon[moon.idx].emoji}</span><span>Dag <b style="color:var(--text)">${pd}</b> i din rytm — <b style="color:var(--gold)">${C.personalDay[pd]}</b>. ${bioTop(p.bio)[0].toUpperCase()+bioTop(p.bio).slice(1)} idag, och månen viskar: ${C.moon[moon.idx].tone}.</span></div>
+  </section>
+
+  <section class="card">
+    <span class="eyebrow">Dina tal</span>
+    <p class="small muted mt6">Tryck på ett tal för att förstå det.</p>
+    <div class="talgrid">
+      <button class="talcell" data-tal="liv" data-v="${p.lifePath}"><b>${p.lifePath}</b><span>Livstal</span></button>
+      <button class="talcell" data-tal="bdag" data-v="${p.birthdayNum}"><b>${p.birthdayNum}</b><span>Födelsedag</span></button>
+      <button class="talcell" data-tal="pyr" data-v="${p.personalYear}"><b>${p.personalYear}</b><span>År ${NOW().getFullYear()}</span></button>
+      ${p.nameNum?`<button class="talcell" data-tal="namn" data-v="${p.nameNum}"><b>${p.nameNum}</b><span>Namntal</span></button>`:''}
+      ${p.plus4?`<button class="talcell" data-tal="djup" data-v="${deepNumber(p)}"><b>${deepNumber(p)}</b><span>Djuptal</span></button>
+      <button class="talcell" data-tal="bar" data-v="${leadDigit(p)}"><b>${leadDigit(p)}</b><span>Bärande</span></button>`:`<button class="talcell ghost" id="talAddP4"><b>＋4</b><span>Djuptal</span></button>`}
+    </div>
+  </section>
+
+  <section class="card">
+    <span class="eyebrow">Din essens</span>
+    <p class="mt10" style="font-family:var(--disp);font-size:16.5px;line-height:1.55;font-weight:340">${esc(firstName(p.name))} är ${p.zodiac.name.toLowerCase()}s ${p.zodiac.element.toLowerCase()} i grunden, går genom livet på ${lp.title.toLowerCase()}s väg — livstal ${p.lifePath} — och bär ${p.chinese.animal.toLowerCase()}s drag: ${an.ord.toLowerCase()}. ${C.moon[birthMoon.idx].name} stod på himlen när du föddes.</p>
+    <p class="small mt10" style="color:var(--faint)">Tre system, en berättelse — resten av rapporten vecklar ut den.</p>
+  </section>
+
+  ${p.plus4?`<section class="card gold">
+    <div class="spread"><span class="eyebrow">Din djupsignatur · tio siffror</span><span class="tag num">${six}–${p.plus4}</span></div>
+    <div class="numsplit mt10">
+      <div class="left"><div class="bignum">${deepNumber(p)}</div><div class="sub">Djuptal</div></div>
+      <div><p class="small muted">${C.deep[deepNumber(p)]}</p></div>
+    </div>
+    <div class="hairline"></div>
+    <span class="eyebrow">Din sifferprofil</span>
+    <div class="dprof">${[1,2,3,4,5,6,7,8,9].map(i=>{const c=digitCounts(p)[i];return `<div class="col ${c?'':'zero'}"><i style="height:${Math.max(6,c*26)}%"></i><span>${i}</span></div>`}).join('')}</div>
+    <p class="small muted mt10">Din bärande siffra är <b style="color:var(--gold)">${leadDigit(p)}</b> — ${C.digitWords[leadDigit(p)]} — den ton som återkommer oftast i dina tio siffror.</p>
+  </section>`:''}
+
+  <section class="card gold">
+    <span class="eyebrow">Din signatur</span>
+    <div class="mt10">${svgRadar([{values:sig,color:'#E8C776',fill:'rgba(232,199,118,.14)'}])}</div>
+    <p class="small muted">Fem dimensioner vävda ur dina tre system — element, livstal och årsdjur. Din tydligaste kraft är <b style="color:var(--gold)">${topDim.k.toLowerCase()}</b> (${topDim.d}); din stillaste sida är ${lowDim.k.toLowerCase()}. Ingen dimension är bättre än en annan — profilens form är din.</p>
+  </section>
+
+  <section class="card">
+    <div class="numsplit">
+      <div class="left"><div class="bignum">${p.lifePath}</div><div class="sub">Livstal</div></div>
+      <div><h3 class="disp">${lp.title}</h3><p class="small muted mt6">${lp.text}</p></div>
+    </div>
+    <div class="chips">${lp.styrkor.map(s=>`<span class="chip mini on">${s}</span>`).join('')}</div>
+    <p class="small mt10" style="color:var(--faint)"><span style="color:var(--gold-dim)">Skuggsida:</span> ${lp.friktion}</p>
+    <div class="hairline"></div>
+    <div class="small muted">Födelsedagstalet <b style="color:var(--text)">${p.birthdayNum}</b> färgar hur din väg tar sig uttryck i vardagen${p.nameNum?` — och ditt namn bär talet <b style="color:var(--text)">${p.nameNum}</b>: utåt uppfattas du ofta ${C.nameNum[p.nameNum]}`:''}.</div>
+  </section>
+
+  <section class="card">
+    <div class="spread"><span class="eyebrow">Stjärntecken</span><span class="pill-el el-${p.zodiac.element}">${p.zodiac.element} · ${p.zodiac.mod}</span></div>
+    <h3 class="disp mt10">${p.zodiac.sym} ${p.zodiac.name}</h3>
+    <p class="small muted mt6">${z.text}</p>
+    <div class="chips">${z.styrkor.map(s=>`<span class="chip mini">${s}</span>`).join('')}</div>
+    <p class="small mt10" style="color:var(--faint)"><span style="color:var(--gold-dim)">Skuggsida:</span> ${z.friktion}</p>
+  </section>
+
+  <section class="card">
+    <div class="spread"><span class="eyebrow">Kinesiskt tecken</span><span class="tag">${p.chinese.year} · ${p.chinese.yin?'yin':'yang'}</span></div>
+    <h3 class="disp mt10">${p.chinese.emoji} ${p.chinese.element}-${p.chinese.animal.toLowerCase()}</h3>
+    <p class="small muted mt6">${an.text} ${C.cnElement[p.chinese.element]}</p>
+    <p class="small mt10" style="color:var(--faint)">Året räknas här från solvårens början (~4 februari). Din harmoniska triangel: ${TRINES.find(t=>t.includes(p.chinese.animalIdx)).map(i=>ANIMALS[i]).join(', ').toLowerCase()}.</p>
+  </section>
+
+  <section class="card">
+    <span class="eyebrow">Månen vid din födsel</span>
+    <div class="moonbig mt10">${C.moon[birthMoon.idx].emoji}</div>
+    <h3 class="disp center mt6">${C.moon[birthMoon.idx].name}</h3>
+    <p class="small muted mt10">${C.moon[birthMoon.idx].birth}</p>
+  </section>
+
+  <section class="card">
+    <span class="eyebrow">Biorytm just nu</span>
+    <div class="mt10">${svgBio({year:p.year,month:p.month,day:p.day})}</div>
+    <div class="biokey"><span><i style="background:var(--eld)"></i>Fysisk · 23 d</span><span><i style="background:var(--vatten)"></i>Emotionell · 28 d</span><span><i style="background:var(--luft)"></i>Intellektuell · 33 d</span></div>
+    <div class="bionow">
+      <div class="cell"><b style="color:var(--eld)">${pct(p.bio.fysisk)}%</b><span>Fysisk</span></div>
+      <div class="cell"><b style="color:var(--vatten)">${pct(p.bio.emotionell)}%</b><span>Emotionell</span></div>
+      <div class="cell"><b style="color:var(--luft)">${pct(p.bio.intellektuell)}%</b><span>Intellekt</span></div>
+    </div>
+    <p class="small muted mt10">Du har levt <b class="num" style="color:var(--text)">${p.bio.n.toLocaleString('sv-SE')}</b> dagar. Fysiskt läge: ${bioWord(p.bio.fysisk)}, emotionellt: ${bioWord(p.bio.emotionell)}, intellektuellt: ${bioWord(p.bio.intellektuell)}. ${bbTxt}</p>
+    <div class="hairline"></div>
+    <span class="eyebrow">Sju dagar framåt</span>
+    <div class="strip7">${[0,1,2,3,4,5,6].map(d=>{const at=new Date(NOW().getFullYear(),NOW().getMonth(),NOW().getDate()+d);
+      const e=selfEnergy(p,at), crit=kritiska.some(k=>k.d===d);
+      const col=e>.62?'var(--gold)':e>.45?'rgba(232,199,118,.45)':'rgba(160,175,210,.35)';
+      return `<div class="sd ${crit?'crit':''}"><b style="background:${col}"></b><span>${d===0?'idag':at.toLocaleDateString('sv-SE',{weekday:'short'}).replace('.','')}</span></div>`}).join('')}</div>
+    ${kritiska.length?`<p class="small mt10" style="color:var(--faint)"><span style="color:var(--gold-dim)">Kritiska dagar</span> — då en cykel korsar nollan och systemet ställer om: ${kritiska.map(k=>`${fmtShort(k.at)} (${k.cycle})`).join(', ')}. Ta det varligt de dagarna.</p>`:''}
+  </section>
+
+  <section class="card gold">
+    <span class="eyebrow">Dina kraftdagar · 30 dagar framåt</span>
+    <p class="small muted mt6">Dagar då rytmen och din personliga dag samverkar som bäst.</p>
+    <div class="mt6">${kraft.map(k=>`<div class="dayrow">
+      <span class="dnum">${fmtShort(k.at)}</span>
+      <span class="dwhy">personlig dag ${k.pd} — ${C.personalDay[k.pd]}</span>
+      <span class="dbar"><i style="width:${Math.round(k.score*100)}%"></i></span></div>`).join('')}</div>
+  </section>
+
+  <section class="card">
+    <span class="eyebrow">Din nioårscykel · ${NOW().getFullYear()}</span>
+    <div class="mt10">${svgYearRing(p.personalYear)}</div>
+    <p class="small muted mt6">${py.text}</p>
+    <p class="small mt10" style="color:var(--faint)">Nästa år: <b style="color:var(--gold-dim)">${C.personalYear[p.personalYear===9?1:reduce(p.personalYear+1,false)].tema.toLowerCase()}</b> — cykeln vandrar alltid vidare.</p>
+  </section>
+
+  <div class="editrow"><button class="btn btn-line" id="editMe" style="flex:1">Redigera min profil</button><button class="btn btn-ghost" id="resetMe">Börja om</button></div>
+  </div>`;
+}
+
+/* ================= VIEW: KRETSEN ================= */
+let circleFilter=null; // group id or null
+let sortMode='samklang';
+function viewCircle(){
+  const me=meProf();
+  let list=circleFilter?membersOf(circleFilter):S.people.slice();
+  if(sortMode==='samklang')list=list.slice().sort((a,b)=>compatibility(me,prof(b)).score-compatibility(me,prof(a)).score);
+  else if(sortMode==='namn')list=list.slice().sort((a,b)=>a.name.localeCompare(b.name,'sv'));
+  else if(sortMode==='nya')list=list.slice().sort((a,b)=>(b.addedAt||0)-(a.addedAt||0));
+  const filterIds=circleFilter?new Set(list.map(p=>p.id)):null;
+  const hasDemo=S.people.some(p=>p.demo);
+  let star=null;
+  for(const p of S.people){const sy=todaySync(me,p);if(!star||sy>star.sync)star={p,pr:prof(p),sync:sy};}
+  const cards=list.map(p=>{
+    const pr=prof(p),comp=compatibility(me,pr).score;
+    return `<button class="pcard" data-open="${p.id}">
+      <span class="avatar" style="background:linear-gradient(150deg,${elColor(pr.zodiac.element)}22,transparent);color:${elColor(pr.zodiac.element)}">${initials(p.name)}<span class="zsym">${pr.zodiac.sym}</span></span>
+      <span class="pmeta"><b>${esc(p.name)}${p.demo?' <span class="tag" style="font-size:9px">exempel</span>':''}</b>
+      <span class="sub">${pr.zodiac.name} · ${pr.chinese.animal.toLowerCase()} · livstal ${pr.lifePath}</span>
+      <span class="sub" style="color:var(--faint)">${p.groups.map(g=>groupById(g)?.name).filter(Boolean).join(' · ')||'ingen grupp'}</span></span>
+      <span class="matchbadge num">${comp}<small>MED DIG</small></span></button>`;
+  }).join('');
+  return `
+  <div class="viewhead"><span class="eyebrow">Min krets</span><h1>Din <span class="serif-i" style="color:var(--gold)">konstellation</span></h1></div>
+  ${S.people.length?`
+  <div id="constellation">${svgConstellation(S.people,filterIds)}<div class="const-hint">Placering = plats på zodiakhjulet · linjens styrka = samklang med dig</div></div>
+  ${star?`<button class="pcard" data-open="${star.p.id}" style="border-color:rgba(232,199,118,.35);background:linear-gradient(150deg,rgba(232,199,118,.08),rgba(255,255,255,.02))">
+    <span class="avatar staravatar" style="background:linear-gradient(150deg,${elColor(star.pr.zodiac.element)}22,transparent);color:${elColor(star.pr.zodiac.element)}">${initials(star.p.name)}</span>
+    <span class="pmeta"><b>Dagens stjärna: ${esc(firstName(star.p.name))}</b>
+    <span class="sub">era rytmer ligger ${star.sync}% i fas idag — en bra dag att höras</span></span>
+    <span class="matchbadge num">${star.sync}<small>I FAS</small></span></button>`:''}
+  <div class="chips mt14">
+    <button class="chip ${!circleFilter?'on':''}" data-filter="">Alla · ${S.people.length}</button>
+    ${S.groups.map(g=>`<button class="chip ${circleFilter===g.id?'on':''}" data-filter="${g.id}">${g.emoji} ${g.name} · ${membersOf(g.id).length}</button>`).join('')}
+    <button class="chip" id="manageGroups">✎ Grupper</button>
+  </div>
+  <div class="row mt10" style="align-items:center"><span class="eyebrow">Personer</span><span class="sortseg">
+    <button class="${sortMode==='samklang'?'on':''}" data-sort="samklang">Samklang</button>
+    <button class="${sortMode==='namn'?'on':''}" data-sort="namn">Namn</button>
+    <button class="${sortMode==='nya'?'on':''}" data-sort="nya">Nya</button></span></div>
+  <div>${cards||'<p class="muted small mt14 center">Inga personer i den här gruppen ännu.</p>'}</div>
+  <div class="mt18"><button class="btn btn-line" id="addFromCircle">+ Lägg till person</button></div>
+  ${hasDemo?'<div class="center mt10"><button class="linkish" id="clearDemo" style="color:var(--faint)">Rensa exempelpersoner</button></div>':'<div class="center mt10"><button class="linkish" id="restoreDemo" style="color:var(--faint)">Återställ exempelpersonerna</button></div>'}
+  `:`
+  <div class="card gold center" style="padding:34px 22px">
+    <div style="font-size:34px">☄️</div>
+    <h2 class="mt10" style="font-weight:340">Kretsen är tom</h2>
+    <p class="muted small mt6">Lägg till människor via QR-kod eller födelsedata, så växer din konstellation fram här.</p>
+    <div class="mt18"><button class="btn btn-gold" id="addFromCircle">Lägg till din första person</button></div>
+  </div>`}`;
+}
+
+/* --- Person sheet --- */
+function openPerson(id){
+  const p=personById(id); if(!p)return;
+  const pr=prof(p), me=meProf(), comp=compatibility(me,pr);
+  const lp=C.lifePath[pr.lifePath], an=C.animals[pr.chinese.animalIdx], z=C.zodiac[pr.zodiac.key];
+  openSheet(`
+    <div class="row" style="gap:14px">
+      <span class="avatar" style="width:54px;height:54px;font-size:20px;background:linear-gradient(150deg,${elColor(pr.zodiac.element)}26,transparent);color:${elColor(pr.zodiac.element)}">${initials(p.name)}</span>
+      <div><h2 style="font-weight:400">${esc(p.name)}</h2><div class="small muted">Född ${fmtDate(p)}</div></div>
+    </div>
+    <div class="chips"><span class="chip mini on">${pr.zodiac.sym} ${pr.zodiac.name}</span><span class="chip mini">${pr.chinese.emoji} ${pr.chinese.element}-${pr.chinese.animal.toLowerCase()}</span><span class="chip mini">Livstal ${pr.lifePath}</span>${p.plus4?`<span class="chip mini" style="border-color:rgba(232,199,118,.4);color:var(--gold)">Djuptal ${deepNumber(pr)}</span>`:`<button class="chip mini" data-addp4="${p.id}" style="border-style:dashed">＋ 4 siffror</button>`}</div>
+    <div class="card" style="margin-top:16px">
+      <div class="row" style="gap:16px">
+        <div style="width:118px;flex-shrink:0">${svgRadar([{values:me.signature,color:'rgba(232,199,118,.5)',fill:'rgba(232,199,118,.06)'},{values:pr.signature,color:elColor(pr.zodiac.element),fill:'rgba(255,255,255,.07)'}],118)}</div>
+        <div class="small muted">${lp.title} till livstalet, ${an.ord.toLowerCase()} enligt årsdjuret. ${z.styrkor.slice(0,2).join(' och ')} i stjärntecknet.
+        <div class="mt10"><b class="num" style="color:var(--gold);font-size:17px">${comp.score}</b> <span class="small">/100 i samklang med dig</span></div></div>
+      </div>
+    </div>
+    <label class="fld">Grupper</label>
+    <div class="chips" style="margin-top:2px">${S.groups.map(g=>`<button class="chip ${p.groups.includes(g.id)?'on':''}" data-toggrp="${g.id}" data-pid="${p.id}">${g.emoji} ${g.name}</button>`).join('')}</div>
+    <div class="mt18" style="display:flex;gap:9px">
+      <button class="btn btn-gold" data-cmpwith="${p.id}">Jämför med mig</button>
+      <button class="btn btn-ghost" style="width:auto;padding:15px 15px" data-editperson="${p.id}" aria-label="Redigera">✎</button>
+      <button class="btn btn-ghost" style="width:auto;padding:15px 15px" data-delperson="${p.id}" aria-label="Ta bort">🗑</button>
+    </div>`);
+}
+
+/* --- Groups manage sheet --- */
+function openGroups(){
+  openSheet(`
+    <h2 style="font-weight:400">Grupper</h2>
+    <p class="small muted mt6">Sortera din krets i kretsar. En person kan ingå i flera grupper.</p>
+    <div class="mt10">${S.groups.map(g=>`
+      <div class="grprow"><span style="font-size:19px">${g.emoji}</span><span class="gname">${esc(g.name)}</span>
+      <span class="tag">${membersOf(g.id).length} pers.</span>
+      <button class="iconbtn" data-delgrp="${g.id}" aria-label="Ta bort grupp">✕</button></div>`).join('')||'<p class="small muted">Inga grupper ännu.</p>'}
+    </div>
+    <label class="fld">Ny grupp</label>
+    <div class="row"><input id="grpEmoji" value="⭐" maxlength="3" style="width:64px;text-align:center;flex-shrink:0"><input id="grpName" placeholder="T.ex. Bokklubben" maxlength="24"></div>
+    <div class="mt14"><button class="btn btn-line" id="createGrp">Skapa grupp</button></div>`);
+}
+
+/* ================= VIEW: JÄMFÖR ================= */
+let cmpMode='overview', cmpA='me', cmpB=null, cmpGroup=null, cmpOvFilter=null;
+function entityLabel(id){
+  if(id==='me')return {name:'Du',sub:meProf().zodiac.name,pr:meProf()};
+  const p=personById(id); if(!p)return null;
+  const pr=prof(p); return {name:firstName(p.name),sub:pr.zodiac.name,pr};
+}
+function viewCompare(){
+  if(!S.people.length) return `<div class="viewhead"><span class="eyebrow">Jämför</span><h1>Mönster <span class="serif-i" style="color:var(--gold)">emellan</span></h1></div>
+    <div class="card center" style="padding:30px"><p class="muted small">Lägg till minst en person i kretsen för att kunna jämföra.</p>
+    <div class="mt14"><button class="btn btn-line" id="addFromCircle">+ Lägg till person</button></div></div>`;
+  let inner = cmpMode==='overview'?cmpOverview():cmpMode==='pair'?cmpPairView():cmpGroupView();
+  return `
+  <div class="viewhead"><span class="eyebrow">Jämför</span><h1>Mönster <span class="serif-i" style="color:var(--gold)">emellan</span></h1></div>
+  <div class="seg"><button class="${cmpMode==='overview'?'on':''}" data-cmpmode="overview">Alla mot dig</button><button class="${cmpMode==='pair'?'on':''}" data-cmpmode="pair">Två personer</button><button class="${cmpMode==='group'?'on':''}" data-cmpmode="group">Grupp</button></div>
+  ${inner}`;
+}
+function cmpOverview(){
+  const me=meProf();
+  const list=(cmpOvFilter?membersOf(cmpOvFilter):S.people)
+    .map(p=>{const pr=prof(p);
+      const deep=(S.me.plus4&&p.plus4)?deepCompatibility(me,pr):null;
+      return {p,pr,score:deep?deep.score:compatibility(me,pr).score,deep,
+        fas:todaySync(me,pr),trend:energyTrend(me,pr)};})
+    .sort((a,b)=>b.score-a.score);
+  const best=list[0];
+  const rows=list.map((r,i)=>{
+    const whyBits=[];
+    if(r.deep)whyBits.push('vägd på tio siffror');
+    whyBits.push(r.fas>=75?'rytmerna ligger i fas':r.fas>=55?'rytmerna delvis i fas':'rytmerna i otakt');
+    whyBits.push(r.trend>0?'energin på väg upp':r.trend<0?'energin på väg ned':'stabil vecka');
+    return `<button class="ovrow" data-cmprow="${r.p.id}">
+      <span class="rank">${i+1}</span>
+      <span class="avatar" style="width:38px;height:38px;font-size:13px;background:linear-gradient(150deg,${elColor(r.pr.zodiac.element)}22,transparent);color:${elColor(r.pr.zodiac.element)}">${initials(r.p.name)}</span>
+      <span class="meta"><b>${esc(firstName(r.p.name))}${r.deep?'<span class="deepbadge">DJUP</span>':''}</b>
+      <span class="why">${whyBits.join(' · ')}</span></span>
+      <span class="nums"><div class="sc num">${r.score}</div><div class="fs">${r.fas}% i fas <span class="trend ${r.trend>0?'up':r.trend<0?'dn':'flat'}">${r.trend>0?'▲':r.trend<0?'▼':'—'}</span></div></span>
+    </button>`;}).join('');
+  return `
+  <div class="chips mt14">
+    <button class="chip ${!cmpOvFilter?'on':''}" data-ovfilter="">Alla · ${S.people.length}</button>
+    ${S.groups.map(g=>`<button class="chip ${cmpOvFilter===g.id?'on':''}" data-ovfilter="${g.id}">${g.emoji} ${esc(g.name)} · ${membersOf(g.id).length}</button>`).join('')}
+  </div>
+  ${best?`<p class="small muted mt10">Just nu matchar <b style="color:var(--gold)">${esc(firstName(best.p.name))}</b> dig bäst${cmpOvFilter?' i den här gruppen':''} — siffran väger samman element, årsdjur, livstal${S.me.plus4?', djupsignatur':''} och signaturlikhet. Pilen visar vart er gemensamma energi är på väg den närmaste veckan.</p>`:'<p class="small muted mt10 center">Inga personer i den här gruppen ännu.</p>'}
+  <div class="mt6">${rows}</div>
+  ${!S.me.plus4?`<div class="card center mt14" style="padding:16px"><p class="small muted">Lägg till dina fyra sista siffror för att låsa upp <b style="color:var(--gold)">djup samklang</b> med de i kretsen som också har tio siffror.</p><button class="p4ghost" id="addPlus4Me" style="margin-top:9px">＋ fyra siffror</button></div>`:''}`;
+}
+function cmpPairView(){
+  const A=entityLabel(cmpA), B=cmpB?entityLabel(cmpB):null;
+  let res='';
+  if(A&&B){
+    const c=compatibility(A.pr,B.pr), [band,bandTxt]=C.scoreBand(c.score);
+    const [cnT,cnTxt]=C.cnRelation(A.pr.chinese.animalIdx,B.pr.chinese.animalIdx);
+    const elTxt=elPairText(A.pr.zodiac.element,B.pr.zodiac.element);
+    const nA=A.pr.bio.n,nB=B.pr.bio.n;
+    const sy={f:cycleSync(nA,nB,23),e:cycleSync(nA,nB,28),i:cycleSync(nA,nB,33)};
+    // next shared physical high (both > .7) within 30 days
+    let shared=null;
+    for(let d=0;d<30;d++){const at=new Date();at.setDate(at.getDate()+d);
+      const a=biorhythm({year:A.pr.year,month:A.pr.month,day:A.pr.day},at).fysisk,
+            b=biorhythm({year:B.pr.year,month:B.pr.month,day:B.pr.day},at).fysisk;
+      if(a>0.65&&b>0.65){shared=d;break;}}
+    const js=jointSeries(A.pr,B.pr), pk=js.reduce((a,b)=>b.v>a.v?b:a), lo=js.reduce((a,b)=>b.v<a.v?b:a), trend=energyTrend(A.pr,B.pr);
+    const deep=deepCompatibility(A.pr,B.pr);
+    const dimDiffs=C.dims.map((d,i)=>({k:d.k,diff:A.pr.signature[i]-B.pr.signature[i]}));
+    const maxSim=dimDiffs.reduce((a,b)=>Math.abs(a.diff)<Math.abs(b.diff)?a:b);
+    const maxCon=dimDiffs.reduce((a,b)=>Math.abs(a.diff)>Math.abs(b.diff)?a:b);
+    const ins=pairInsights(A.pr,B.pr,c), rt=relationTal(A.pr.lifePath,B.pr.lifePath);
+    res=`
+    <section class="fadein">
+      <div class="duo">
+        <div class="duocard" style="border-color:rgba(232,199,118,.3)"><div class="nm">${esc(A.name)}</div><div class="es">${miniEssens(A.pr)}</div></div>
+        <div class="duocard"><div class="nm">${esc(B.name)}</div><div class="es">${miniEssens(B.pr)}</div></div>
+      </div>
+    </section>
+    <section class="card gold center fadein">
+      <span class="eyebrow">Samklang · sex siffror</span>
+      <div class="dial mt10">${svgDial(c.score)}<div class="val"><b class="num">${c.score}</b><span>samklang</span></div></div>
+      <h3 class="disp">${band}</h3><p class="small muted mt6">${bandTxt}</p>
+    </section>
+    ${deep?`<section class="card fadein">
+      <div class="spread"><span class="eyebrow">Djupsignaturerna · tio siffror</span><span class="deepbadge">DJUP</span></div>
+      <div class="numsplit mt10">
+        <div class="left"><div class="bignum" style="font-size:44px">${deep.score}</div><div class="sub">Djup samklang</div></div>
+        <div><p class="small muted">Djuptal <b style="color:var(--text)">${deep.dA}</b> möter <b style="color:var(--text)">${deep.dB}</b> — ${deep.aff>=90?'samma undertext: ni känner igen er i varandras drivkraft.':deep.aff>=80?'talen hör till samma familj — olika uttryck, samma riktning.':'talen talar olika språk under ytan — det ni visar utåt bär relationen.'}</p></div>
+      </div>
+      ${deep.shared.length?`<div class="hairline"></div><span class="eyebrow">Siffror ni delar</span><div class="sharedd">${deep.shared.map(d=>`<i>${d}</i>`).join('')}</div>
+      <p class="small muted mt6">${deep.shared.length>=4?'Ovanligt många gemensamma siffror — era tio siffror är byggda av liknande material.':`Gemensam ton i ${deep.shared.map(d=>C.digitWords[d]).join(', ')}.`}</p>`:''}
+    </section>`:(A.pr.plus4||B.pr.plus4)?`<section class="card fadein center" style="padding:18px">
+      <p class="small muted">${A.pr.plus4?`${esc(B.name)} saknar sina fyra sista siffror`:`Du saknar dina fyra sista siffror`} — lägg till dem för att se er <b style="color:var(--gold)">djupa samklang</b>.</p>
+    </section>`:''}
+    <section class="card fadein">
+      <span class="eyebrow">Era rytmer var för sig</span>
+      ${[A,B].map(P=>`<div class="mt10"><b style="font-size:13px">${esc(P.name)} · ±10 dagar</b>
+        <div class="mt6">${svgBio({year:P.pr.year,month:P.pr.month,day:P.pr.day},10,352,108)}</div></div>`).join('')}
+      <div class="duorytm">
+        ${[A,B].map(P=>{const bio=P.pr.bio, bb=bestBioDay(P.pr);
+          const bars=[['fysisk','var(--eld)'],['emotionell','var(--vatten)'],['intellektuell','var(--luft)']]
+            .map(([k,c])=>`<i style="height:${Math.round((bio[k]+1)/2*100)}%;background:${c}"></i>`).join('');
+          return `<div class="cellr"><b>${esc(P.name)}</b>
+            <div class="minibars">${bars}</div>
+            <div class="bd">${bioWord(bio.fysisk)} kropp · ${bioWord(bio.emotionell)} känsla · ${bioWord(bio.intellektuell)} tanke<br>Bästa dag: ${bb===0?'idag':'om '+bb+' '+(bb===1?'dag':'dagar')}</div></div>`}).join('')}
+      </div>
+      <p class="small mt10" style="color:var(--faint)">Röd stapel = fysisk cykel (23 d), grön = emotionell (28 d), blå = intellektuell (33 d) — dagens nivå för var och en av er.</p>
+    </section>
+    <section class="card fadein">
+      <span class="eyebrow">Rytm i fas?</span>
+      <div class="barrow"><span class="lab">Fysisk</span><div class="bar"><i style="width:${sy.f}%;background:var(--eld)"></i></div><span class="pct num">${sy.f}%</span></div>
+      <div class="barrow"><span class="lab">Emotionell</span><div class="bar"><i style="width:${sy.e}%;background:var(--vatten)"></i></div><span class="pct num">${sy.e}%</span></div>
+      <div class="barrow"><span class="lab">Intellektuell</span><div class="bar"><i style="width:${sy.i}%;background:var(--luft)"></i></div><span class="pct num">${sy.i}%</span></div>
+      <p class="small muted mt10">Fasläge mellan era biorytmer — 100 % betyder att ni svänger i takt. ${shared!==null?(shared===0?'Ni är båda fysiskt på topp <b style="color:var(--text)">idag</b> — bra dag för något aktivt ihop.':`Nästa dag då ni båda är fysiskt på topp: om <b style="color:var(--text)">${shared} ${shared===1?'dag':'dagar'}</b>.`):'Inom en månad hittar era fysiska toppar inte varandra — planera lugna möten.'}</p>
+      <p class="small mt6" style="color:var(--faint)">Fasläget mellan två människor är konstant genom livet — det ni föddes med behåller ni. Det som varierar är energin nedan.</p>
+    </section>
+    <section class="card gold fadein">
+      <span class="eyebrow">Er gemensamma energi · 30 dagar</span>
+      <div class="mt10">${svgSpark(js)}</div>
+      <p class="small muted mt6">Hur höga era tre cykler är <i>samtidigt</i>. Idag: <b style="color:var(--text)">${js[0].v}</b> av 100${trend!==0?`, och kurvan pekar ${trend>0?'<b style="color:#9AD9A5">uppåt</b>':'<b style="color:#E09B8E">nedåt</b>'} den närmaste veckan`:''}. Toppen infaller <b style="color:var(--gold)">${fmtShort(pk.at)}</b> (${pk.v}) — boka något som kräver er båda då. Lägst kring ${fmtShort(lo.at)} (${lo.v}) — spara konflikterna till en annan dag.</p>
+      <div class="hairline"></div>
+      <span class="eyebrow">Era bästa dagar · 30 dagar framåt</span>
+      <div class="mt6">${js.slice(1).sort((a,b)=>b.v-a.v).slice(0,3).sort((a,b)=>a.d-b.d).map(k=>`<div class="dayrow">
+        <span class="dnum">${fmtShort(k.at)}</span>
+        <span class="dwhy">gemensam energi ${k.v} av 100</span>
+        <span class="dbar"><i style="width:${k.v}%"></i></span></div>`).join('')}</div>
+    </section>
+    <section class="card fadein">
+      <span class="eyebrow">Varför ni fungerar — och var det skaver</span>
+      <div class="mt6">
+        <div class="insrow"><span class="ic">✦</span><p><b>Styrkan.</b> ${ins.styrka}</p></div>
+        <div class="insrow"><span class="ic">⚡</span><p><b>Skavet.</b> ${ins.skav[0].toUpperCase()+ins.skav.slice(1)}</p></div>
+        ${ins.facts.map(f=>`<div class="insrow"><span class="ic">◦</span><p><b>Det intressanta.</b> ${f}</p></div>`).join('')}
+      </div>
+      <div class="hairline"></div>
+      <div class="numsplit"><div class="left"><div class="bignum" style="font-size:40px">${rt}</div><div class="sub">Ert tal</div></div>
+      <div><p class="small muted">Era livstal tillsammans blir <b style="color:var(--text)">${rt}</b> — ${C.lifePath[rt].title.toLowerCase().replace(' · mästartal','')}s energi: ${C.numTone[rt]}. Det är relationens eget tal, inte någons enskilda.</p></div></div>
+    </section>
+    <section class="card fadein">
+      <span class="eyebrow">Signaturerna över varandra</span>
+      <div class="mt10">${svgRadar([{values:A.pr.signature,color:'#E8C776',fill:'rgba(232,199,118,.12)'},{values:B.pr.signature,color:elColor(B.pr.zodiac.element),fill:'rgba(255,255,255,.06)'}])}</div>
+      <div class="biokey"><span><i style="background:#E8C776"></i>${esc(A.name)}</span><span><i style="background:${elColor(B.pr.zodiac.element)}"></i>${esc(B.name)}</span></div>
+      <p class="small muted mt10">Mest lika i <b style="color:var(--text)">${maxSim.k.toLowerCase()}</b>; störst kontrast i <b style="color:var(--text)">${maxCon.k.toLowerCase()}</b> — där ${maxCon.diff>0?esc(A.name):esc(B.name)} bär mer av energin.</p>
+    </section>
+    <section class="card fadein">
+      <span class="eyebrow">Elementen</span>
+      <div class="row mt10" style="gap:8px"><span class="pill-el el-${A.pr.zodiac.element}">${A.pr.zodiac.sym} ${A.pr.zodiac.element}</span><span class="faint">möter</span><span class="pill-el el-${B.pr.zodiac.element}">${B.pr.zodiac.sym} ${B.pr.zodiac.element}</span></div>
+      <p class="small muted mt10">${elTxt}</p>
+      <div class="hairline"></div>
+      <span class="eyebrow">Årsdjuren · ${cnT}</span>
+      <p class="small muted mt6">${B.pr.chinese.emoji} ${cnTxt}</p>
+      <div class="hairline"></div>
+      <span class="eyebrow">Livstalen ${A.pr.lifePath} & ${B.pr.lifePath}</span>
+      <p class="small muted mt6">${C.lifePath[A.pr.lifePath].title} möter ${C.lifePath[B.pr.lifePath].title.toLowerCase().replace(' · mästartal','')} — ${c.lp>=80?'en av numerologins mest gynnsamma pareringar.':c.lp>=68?'tal som förstår varandras språk.':'tal som drar åt olika håll; ni får förhandla om takten.'}</p>
+    </section>
+    `;
+  }
+  return `<div class="duel">
+    <button class="duelslot ${A?'filled':''}" data-pick="A">${A?`<b>${esc(A.name)}</b><span class="sub">${A.sub}</span>`:'<b>Välj person</b>'}</button>
+    <div class="vs">mot</div>
+    <button class="duelslot ${B?'filled':''}" data-pick="B">${B?`<b>${esc(B.name)}</b><span class="sub">${B.sub}</span>`:'<b>Välj person</b><span class="sub">tryck här</span>'}</button>
+  </div>${(cmpB||cmpA!=='me')?`<button class="clearcmp" id="clearCmp">Rensa valet</button>`:''}${res||'<p class="center small muted mt18">Välj två personer — eller dig själv mot någon i kretsen.</p>'}`;
+}
+
+function cmpGroupView(){
+  if(!S.groups.length) return '<p class="center small muted mt18">Skapa en grupp i Kretsen först.</p>';
+  if(!cmpGroup||!groupById(cmpGroup)) cmpGroup=S.groups.find(g=>membersOf(g.id).length)?.id||S.groups[0].id;
+  const g=groupById(cmpGroup), members=membersOf(cmpGroup);
+  const chips=`<div class="chips mt14">${S.groups.map(x=>`<button class="chip ${x.id===cmpGroup?'on':''}" data-pickgrp="${x.id}">${x.emoji} ${x.name} · ${membersOf(x.id).length}</button>`).join('')}</div>`;
+  if(members.length<2) return chips+`<div class="card center fadein" style="padding:26px"><p class="small muted">${esc(g.name)} behöver minst två personer för gruppinsikter. Lägg till fler i Kretsen.</p></div>`;
+  const me=meProf(), profs=members.map(prof);
+  // element distribution
+  const elCount={Eld:0,Jord:0,Luft:0,Vatten:0}; profs.forEach(p=>elCount[p.zodiac.element]++);
+  const domEl=Object.entries(elCount).sort((a,b)=>b[1]-a[1])[0][0];
+  const elDom={Eld:'Gruppen bär mycket eld: tempo, initiativ och rejält med vilja. Räkna med att saker händer — och med en och annan gnista.',
+    Jord:'Jord dominerar: gruppen är stabil, praktisk och håller vad den lovar. Förändring tas i jämn, egen takt.',
+    Luft:'Luften dominerar: idéer, prat och rörlighet. Gruppen tänker högt och snabbt — någon får gärna hålla i landningsbanan.',
+    Vatten:'Vatten dominerar: gruppen känner mer än den säger, läser varandra väl och går på djupet snarare än bredden.'}[domEl];
+  // avg signature
+  const avg=[0,1,2,3,4].map(i=>Math.round(profs.reduce((s,p)=>s+p.signature[i],0)/profs.length));
+  // pairs
+  let best=null,worst=null;
+  for(let i=0;i<profs.length;i++)for(let j=i+1;j<profs.length;j++){
+    const sc=compatibility(profs[i],profs[j]).score;
+    if(!best||sc>best.sc)best={a:profs[i],b:profs[j],sc};
+    if(!worst||sc<worst.sc)worst={a:profs[i],b:profs[j],sc};
+  }
+  // me vs group
+  const myAvg=Math.round(profs.reduce((s,p)=>s+compatibility(me,p).score,0)/profs.length);
+  const myBest=profs.reduce((a,p)=>compatibility(me,p).score>compatibility(me,a).score?p:a);
+  // life path spread
+  const lps=[...new Set(profs.map(p=>p.lifePath))].sort((a,b)=>a-b);
+  const animals=[...new Set(profs.map(p=>p.chinese.animal))];
+  return chips+`
+  <section class="card fadein">
+    <span class="eyebrow">Gruppens signatur — och din</span>
+    <div class="mt10">${svgRadar([{values:avg,color:'#9BA8CC',fill:'rgba(155,168,204,.12)'},{values:me.signature,color:'#E8C776',fill:'rgba(232,199,118,.10)'}])}</div>
+    <div class="biokey"><span><i style="background:#9BA8CC"></i>${esc(g.name)} (snitt)</span><span><i style="background:#E8C776"></i>Du</span></div>
+    <p class="small muted mt10">Din samklang med gruppen är i snitt <b class="num" style="color:var(--gold)">${myAvg}</b>/100. Starkast band har du till <b style="color:var(--text)">${esc(firstName(myBest.name))}</b> (${compatibility(me,myBest).score}).</p>
+  </section>
+  <section class="card gold fadein">
+    <span class="eyebrow">Gruppens bästa dag · 14 dagar framåt</span>
+    ${(()=>{const all=[meProf(),...members.map(prof)];let best={d:0,v:-1};
+      for(let d=0;d<=14;d++){const at=new Date(NOW().getFullYear(),NOW().getMonth(),NOW().getDate()+d);
+        const v=all.reduce((s,P)=>s+selfEnergy(P,at),0)/all.length;
+        if(v>best.v)best={d,v,at};}
+      return `<p class="small muted mt6">Räknat på allas biorytmer — din inräknad — toppar gruppens samlade energi <b style="color:var(--gold)">${best.d===0?'idag':fmtShort(best.at)}</b> (${Math.round(best.v*100)} av 100). ${best.d===0?'Ring dem nu.':'En bra dag för '+g.emoji+' '+esc(g.name.toLowerCase())+' att ses.'}</p>`})()}
+  </section><section class="card gold fadein">
+    <span class="eyebrow">${esc(g.emoji)} ${esc(g.name)} · ${members.length} personer</span>
+    <h3 class="disp mt10">Gruppens karaktär</h3>
+    <p class="small muted mt6">${elDom} Livstalen spänner över ${lps.join(', ')} och årsdjuren räknar ${animals.length} av tolv: ${animals.map(a=>a.toLowerCase()).join(', ')}.</p>
+    ${['Eld','Jord','Luft','Vatten'].map(e=>`<div class="barrow"><span class="lab tx-${e}">${e}</span><div class="bar"><i style="width:${Math.round(elCount[e]/members.length*100)}%;background:${elColor(e)}"></i></div><span class="pct num">${elCount[e]}</span></div>`).join('')}
+  </section>
+  <section class="card fadein">
+    <span class="eyebrow">Paren i gruppen</span>
+    <div class="mt10 small"><span class="tag" style="color:var(--ok)">Starkaste paret</span>
+      <div class="spread mt6"><b>${esc(firstName(best.a.name))} & ${esc(firstName(best.b.name))}</b><b class="num" style="color:var(--ok)">${best.sc}</b></div>
+      <p class="muted" style="margin-top:3px">${C.scoreBand(best.sc)[1]}</p></div>
+    <div class="hairline"></div>
+    <div class="small"><span class="tag" style="color:var(--eld)">Största kontrasten</span>
+      <div class="spread mt6"><b>${esc(firstName(worst.a.name))} & ${esc(firstName(worst.b.name))}</b><b class="num" style="color:var(--eld)">${worst.sc}</b></div>
+      <p class="muted" style="margin-top:3px">${C.scoreBand(worst.sc)[1]}</p></div>
+  </section>
+  `;
+}
+
+/* ================= VIEW: KOPPLA ================= */
+function viewConnect(){
+  const me=S.me, code=shareCode(me);
+  return `
+  <div class="viewhead"><span class="eyebrow">Koppla</span><h1>Byt <span class="serif-i" style="color:var(--gold)">stjärnbilder</span></h1></div>
+  <section class="card gold center">
+    <span class="eyebrow">Min kod</span>
+    <div class="qrbox" id="qrbox" aria-label="Min QR-kod"></div>
+    <p class="small muted">Låt någon läsa av koden — eller dela textkoden nedan. Den bär bara namn och födelsedatum, inget mer.</p>
+    <div class="codechip"><code>${code}</code><button class="btn-sm btn-line" id="copyCode" style="border-radius:9px;border:1px solid var(--line);color:var(--gold);flex-shrink:0">Kopiera</button></div>
+  </section>
+  <section class="card">
+    <span class="eyebrow">Läs av någon annans kod</span>
+    <div class="scanframe" aria-hidden="true">
+      <span class="corner" style="top:10px;left:10px;border-right:none;border-bottom:none;border-radius:8px 0 0 0"></span>
+      <span class="corner" style="top:10px;right:10px;border-left:none;border-bottom:none;border-radius:0 8px 0 0"></span>
+      <span class="corner" style="bottom:10px;left:10px;border-right:none;border-top:none;border-radius:0 0 0 8px"></span>
+      <span class="corner" style="bottom:10px;right:10px;border-left:none;border-top:none;border-radius:0 0 8px 0"></span>
+      <span class="laser"></span>
+      <span class="msg">Kamerasökare (prototyp) — rikta mot en Konstellation-kod, eller använd alternativen nedan.</span>
+    </div>
+    <div class="mt14"><button class="btn btn-gold" id="demoScan">Simulera skanning · en vän dyker upp</button></div>
+    <label class="fld">…eller klistra in en textkod</label>
+    <div class="row"><input id="pasteCode" placeholder="KON1.…" autocomplete="off"><button class="btn btn-line btn-sm" id="usePaste" style="flex-shrink:0;padding:13px 16px">Läs</button></div>
+    <div class="fieldmsg" id="pasteMsg"></div>
+  </section>
+  <section class="card">
+    <span class="eyebrow">Lägg till manuellt</span>
+    <p class="small muted mt6">För den som inte har appen — personnummer eller födelsedatum räcker.</p>
+    <div class="mt10"><button class="btn btn-ghost" id="manualAdd">Lägg till med födelsedata</button></div>
+  </section>`;
+}
+
+/* --- QR rendering: qrcodejs via CDN, deterministic glyph fallback --- */
+function renderQR(){
+  const box=$('#qrbox'); if(!box)return;
+  const code=shareCode(S.me);
+  box.innerHTML='';
+  if(window.QRCode){
+    try{ new QRCode(box,{text:code,width:184,height:184,colorDark:'#141B30',colorLight:'#F3EFE4',correctLevel:QRCode.CorrectLevel.M}); return; }catch(e){}
+  }
+  // fallback: deterministic identity glyph (still scannable-agnostic visual)
+  let h=0; for(const ch of code) h=(h*31+ch.charCodeAt(0))>>>0;
+  const rnd=()=>{h^=h<<13;h>>>=0;h^=h>>17;h^=h<<5;h>>>=0;return h/4294967295;};
+  let cells='';
+  for(let y=0;y<13;y++)for(let x=0;x<7;x++){ if(rnd()>.5){cells+=`<rect x="${x*14}" y="${y*14}" width="13" height="13" rx="2.5"/><rect x="${(12-x)*14}" y="${y*14}" width="13" height="13" rx="2.5"/>`;} }
+  box.innerHTML=`<svg viewBox="0 0 182 182" width="184" height="184" fill="#141B30">${cells}</svg>`;
+}
+
+/* --- Preview & add flow --- */
+function openAddPreview(cand,via){
+  const dup=S.people.find(p=>p.name===cand.name&&p.year===cand.year&&p.month===cand.month&&p.day===cand.day);
+  const pr=prof(cand), me=meProf(), comp=compatibility(me,pr).score;
+  openSheet(`
+    <div class="center">
+      <span class="eyebrow">${via==='scan'?'Kod avläst':'Ny profil'}</span>
+      <div class="avatar" style="width:62px;height:62px;font-size:23px;margin:14px auto 0;background:linear-gradient(150deg,${elColor(pr.zodiac.element)}26,transparent);color:${elColor(pr.zodiac.element)}">${initials(cand.name)}</div>
+      <h2 class="mt10" style="font-weight:400">${esc(cand.name)}</h2>
+      <div class="small muted">Född ${fmtDate(cand)}${cand.plus4?' · <span class="deepbadge">DJUP</span>':''}</div>
+      <div class="chips" style="justify-content:center"><span class="chip mini on">${pr.zodiac.sym} ${pr.zodiac.name}</span><span class="chip mini">${pr.chinese.emoji} ${pr.chinese.animal}</span><span class="chip mini">Livstal ${pr.lifePath}</span></div>
+      <p class="small muted mt10">Samklang med dig: <b class="num" style="color:var(--gold)">${comp}</b>/100</p>
+    </div>
+    ${dup?'<p class="small center mt10" style="color:var(--danger)">Den här personen finns redan i din krets.</p>':`
+    <label class="fld">Lägg i grupper (valfritt)</label>
+    <div class="chips" id="addGrpChips">${S.groups.map(g=>`<button class="chip" data-selgrp="${g.id}">${g.emoji} ${g.name}</button>`).join('')}</div>
+    <div class="mt18"><button class="btn btn-gold" id="confirmAdd">Lägg till i kretsen</button></div>`}
+  `);
+  sheetCtx={cand,via};
+}
+let setSel=new Set();
+function openSettings(){
+  setSel=new Set();
+  const ppl=S.people.slice().sort((a,b)=>a.name.localeCompare(b.name,'sv'));
+  openSheet(`
+    <h2 style="font-weight:400">Inställningar</h2>
+    <p class="small mt6" style="color:var(--faint)">🔒 Konstellation är lokal först: ingenting lagras på någon server, inget konto finns. Allt nedan ändrar bara data på den här enheten — och du bestämmer.</p>
+    <div class="setsec"><span class="eyebrow">Min profil</span>
+      <button class="setrow" id="setEditMe"><span class="grow">${esc(S.me.name)}<span class="sub">${sixOf(S.me).replace(/(\d{2})(?=\d)/g,'$1 ')}${S.me.plus4?' – '+S.me.plus4+' · djupsignatur upplåst':' · sex siffror'}</span></span><span class="mini-edit">✎</span></button>
+      <p class="small mt6" style="color:var(--faint)">Byt namn och siffror fritt — riktiga eller påhittade. De fyra extra kan läggas till eller tas bort här.</p>
+    </div>
+    <div class="setsec"><span class="eyebrow">Grupper</span>
+      <button class="setrow" id="setGroups"><span class="grow">Hantera grupper<span class="sub">${S.groups.map(g=>g.emoji+' '+esc(g.name)).join(' · ')||'inga grupper'}</span></span><span class="mini-edit">→</span></button>
+      ${S.groups.length?`<button class="setrow" id="setClearGrp"><span class="grow">Töm en grupp<span class="sub">ta bort gruppens personer ur kretsen</span></span><span class="mini-edit">→</span></button>`:''}
+    </div>
+    <div class="setsec"><span class="eyebrow">Personer · ${ppl.length}</span>
+      ${ppl.map(p=>`<div class="setrow ${setSel.has(p.id)?'sel':''}" data-selrow="${p.id}">
+        <span class="cb">${setSel.has(p.id)?'✓':''}</span>
+        <span class="grow">${esc(p.name)}${p.demo?' <span class="tag" style="font-size:9px">exempel</span>':''}<span class="sub">${fmtDate(p)}${p.plus4?' · djup':''}</span></span>
+        <button class="mini-edit" data-editperson="${p.id}">✎</button></div>`).join('')||'<p class="small muted">Kretsen är tom.</p>'}
+      <div class="mt10" id="setDelWrap" class="hidden"></div>
+    </div>
+    <div class="setsec"><span class="eyebrow">Rensa</span>
+      ${S.people.some(p=>p.demo)?`<button class="setrow" id="setClearDemo"><span class="grow">Rensa exempelpersonerna</span></button>`
+        :`<button class="setrow" id="setRestoreDemo"><span class="grow">Återställ exempelpersonerna</span></button>`}
+      <button class="setrow" id="setWipe"><span class="grow danger">Radera all lokal data<span class="sub">profil, krets och grupper — kan inte ångras</span></span></button>
+    </div>`);
+  updateSetDel();
+}
+function updateSetDel(){
+  const w=$('#setDelWrap'); if(!w)return;
+  w.innerHTML=setSel.size?`<button class="btn btn-gold" id="setDelSel">Ta bort valda · ${setSel.size}</button>`:'';
+  const d=$('#setDelSel'); if(d)d.onclick=()=>{
+    S.people=S.people.filter(p=>!setSel.has(p.id));
+    if(cmpB&&!personById(cmpB))cmpB=null; if(cmpA!=='me'&&!personById(cmpA))cmpA='me';
+    saveState();render();toast(setSel.size===1?'Personen borttagen':'Personerna borttagna');openSettings();
+  };
+}
+function openClearGroup(){
+  openSheet(`<h2 style="font-weight:400">Töm en grupp</h2>
+    <p class="small muted mt6">Personerna i vald grupp tas bort ur hela kretsen. Gruppen finns kvar, tom.</p>
+    <div class="mt10">${S.groups.map(g=>`<button class="setrow" data-cleargrp="${g.id}"><span class="grow">${g.emoji} ${esc(g.name)}<span class="sub">${membersOf(g.id).length} personer</span></span></button>`).join('')}</div>`);
+}
+function openEditProfile(targetId){
+  const isMe=targetId==='me', obj=isMe?S.me:personById(targetId);
+  const six=sixOf(obj);
+  openSheet(`
+    <h2 style="font-weight:400">${isMe?'Redigera din profil':'Redigera '+esc(firstName(obj.name))}</h2>
+    <label class="fld">Namn</label><input id="eName" maxlength="60" value="${esc(obj.name)}">
+    <label class="fld">Födelsedatum · ÅÅMMDD</label>
+    <input id="eSix" class="pnr num" inputmode="numeric" maxlength="8" value="${six.replace(/(\d{2})(?=\d)/g,'$1 ').trim()}">
+    <div class="fieldmsg" id="eSixMsg"></div>
+    <label class="fld">Fyra siffror till <span style="color:var(--faint);text-transform:none;letter-spacing:0">(valfritt — töm för att ta bort)</span></label>
+    <input id="eP4" class="pnr num" inputmode="numeric" maxlength="4" value="${obj.plus4||''}" placeholder="XXXX">
+    <div class="mt14"><button class="btn btn-gold" id="eSave" data-target="${targetId}">Spara ändringar</button></div>`);
+}
+function openNumberSheet(kind,v){
+  const meta=C.numMeta[kind];
+  const body=kind==='liv'?`<p class="small muted mt10">${C.lifePath[v].text}</p>
+      <div class="chips">${C.lifePath[v].styrkor.map(s=>`<span class="chip mini on">${s}</span>`).join('')}</div>
+      <p class="small mt10" style="color:var(--faint)"><span style="color:var(--gold-dim)">Skuggsida:</span> ${C.lifePath[v].friktion}</p>`
+    :kind==='pyr'?`<p class="small muted mt10"><b style="color:var(--text)">${C.personalYear[v].tema}.</b> ${C.personalYear[v].text}</p>`
+    :kind==='djup'?`<p class="small muted mt10">${C.deep[v]}</p>`
+    :kind==='namn'?`<p class="small muted mt10">Utåt uppfattas du ofta ${C.nameNum[v]} — det är namnets klang, inte hela sanningen om dig.</p>`
+    :`<p class="small muted mt10">Talet ${v} bär ${C.numTone[v]||C.numTone[reduce(v,false)]}.</p>`;
+  openSheet(`<span class="eyebrow">${meta.t}</span>
+    <div class="numsplit mt10"><div class="left"><div class="bignum">${v}</div></div>
+    <div><p class="small muted">${meta.d}</p></div></div>
+    <div class="hairline"></div>${body}`);
+}
+function openPlus4(targetId){
+  const isMe=targetId==='me', who=isMe?'dina':firstName(personById(targetId).name)+'s';
+  openSheet(`
+    <h2 style="font-weight:400">Fyra siffror till</h2>
+    <p class="small muted mt6">De fyra sista siffrorna låser upp ${isMe?'din':'en'} djupsignatur — djuptal, sifferprofil och djup samklang. Helt valfritt, och de stannar på enheten.</p>
+    <label class="fld">${who[0].toUpperCase()+who.slice(1)} fyra sista siffror</label>
+    <input id="p4in" class="pnr num" inputmode="numeric" placeholder="XXXX" maxlength="4">
+    <div class="fieldmsg" id="p4msg"></div>
+    <div class="mt10"><button class="btn btn-gold" id="p4save" data-target="${targetId}">Lås upp djupsignaturen ✦</button></div>`);
+}
+function openManualAdd(prefill){
+  openSheet(`
+    <h2 style="font-weight:400">Lägg till person</h2>
+    <p class="small muted mt6">Namn och sex siffror — mer behövs inte.</p>
+    <label class="fld">Namn</label><input id="mName" placeholder="För- och efternamn" maxlength="60" value="${esc(prefill?.name||'')}">
+    <label class="fld">Födelsedatum · ÅÅMMDD</label>
+    <input id="mSix" class="pnr num" inputmode="numeric" placeholder="ÅÅ MM DD" maxlength="8">
+    <div class="fieldmsg" id="mSixMsg"></div>
+    <label class="fld">Fyra siffror till <span style="color:var(--faint);text-transform:none;letter-spacing:0">(valfritt)</span></label>
+    <input id="mP4" class="pnr num" inputmode="numeric" placeholder="XXXX" maxlength="4">
+    <div class="mt10"><button class="btn btn-gold" id="mSubmit">Se förhandsvisning</button></div>`);
+}
+
+/* ================= SHEET INFRA ================= */
+let sheetCtx=null;
+function openSheet(html){ $('#sheetBody').innerHTML=html; $('#scrim').classList.add('show'); $('#sheet').classList.add('show'); bindSheet(); }
+function closeSheet(){ $('#scrim').classList.remove('show'); $('#sheet').classList.remove('show'); sheetCtx=null; }
+$('#scrim').addEventListener('click',closeSheet);
+
+/* --- person picker --- */
+function openPicker(slot){
+  const opts=[{id:'me',name:'Du själv',sub:S.me.name}].concat(S.people.map(p=>({id:p.id,name:p.name,sub:prof(p).zodiac.name+' · livstal '+prof(p).lifePath})));
+  openSheet(`<h2 style="font-weight:400">Välj ${slot==='A'?'första':'andra'} person</h2><div class="mt10">${opts.map(o=>{
+    const taken=(slot==='A'?cmpB:cmpA)===o.id;
+    return `<button class="pcard" data-choose="${o.id}" ${taken?'disabled style="opacity:.35"':''}><span class="pmeta"><b>${esc(o.name)}</b><span class="sub">${esc(o.sub)}</span></span>${taken?'<span class="tag">vald</span>':''}</button>`;}).join('')}</div>`);
+  sheetCtx={slot};
+}
+
+/* ================= EVENTS ================= */
+function bindView(root){
+  root.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>openPerson(b.dataset.open));
+  root.querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>{circleFilter=b.dataset.filter||null;render();});
+  root.querySelectorAll('[data-sort]').forEach(b=>b.onclick=()=>{sortMode=b.dataset.sort;render();});
+  root.querySelectorAll('.cstar').forEach(g=>g.addEventListener('click',()=>openPerson(g.dataset.pid)));
+  root.querySelectorAll('[data-cmpmode]').forEach(b=>b.onclick=()=>{cmpMode=b.dataset.cmpmode;render();});
+  root.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>openPicker(b.dataset.pick));
+  root.querySelectorAll('[data-pickgrp]').forEach(b=>b.onclick=()=>{cmpGroup=b.dataset.pickgrp;render();});
+  root.querySelectorAll('[data-cmprow]').forEach(b=>b.onclick=()=>{cmpMode='pair';cmpA='me';cmpB=b.dataset.cmprow;render();$('#main').scrollTop=0;});
+  root.querySelectorAll('[data-ovfilter]').forEach(b=>b.onclick=()=>{cmpOvFilter=b.dataset.ovfilter||null;render();});
+  const p4m=$('#addPlus4Me'); if(p4m)p4m.onclick=()=>openPlus4('me');
+  root.querySelectorAll('[data-tal]').forEach(b=>b.onclick=()=>openNumberSheet(b.dataset.tal,+b.dataset.v));
+  const tap4=$('#talAddP4'); if(tap4)tap4.onclick=()=>openPlus4('me');
+  const ov4=$('#ovAddP4'); if(ov4)ov4.onclick=()=>openPlus4('me');
+  const em=$('#editMe'); if(em)em.onclick=()=>openEditProfile('me');
+  const ccx=$('#clearCmp'); if(ccx)ccx.onclick=()=>{cmpA='me';cmpB=null;render();};
+  const rd=$('#restoreDemo'); if(rd)rd.onclick=()=>{
+    const have=new Set(S.people.map(p=>p.name));
+    SEED_PEOPLE.forEach(p=>{if(!have.has(p.name))S.people.push({id:uid(),...p,groups:[...p.groups]});});
+    saveState();render();toast('Exempelpersonerna är tillbaka');};
+  const mg=$('#manageGroups'); if(mg)mg.onclick=openGroups;
+  const add=$('#addFromCircle'); if(add)add.onclick=()=>{go('connect');};
+  const cd=$('#clearDemo'); if(cd)cd.onclick=()=>{
+    openSheet(`<h2 style="font-weight:400">Rensa exempelpersoner?</h2><p class="small muted mt6">De nio exempelpersonerna tas bort. Personer du själv lagt till behålls.</p>
+    <div class="mt18" style="display:flex;gap:9px"><button class="btn btn-ghost" id="cancelSheet">Avbryt</button><button class="btn btn-gold" id="doClearDemo">Rensa</button></div>`);};
+  const rm=$('#resetMe'); if(rm)rm.onclick=()=>{
+    openSheet(`<h2 style="font-weight:400">Börja om?</h2><p class="small muted mt6">Din profil och hela kretsen rensas från den här enheten. Det går inte att ångra.</p>
+    <div class="mt18" style="display:flex;gap:9px"><button class="btn btn-ghost" id="cancelSheet">Avbryt</button><button class="btn btn-gold" id="doReset">Rensa allt</button></div>`);};
+  // connect view
+  const cc=$('#copyCode'); if(cc)cc.onclick=async()=>{try{await navigator.clipboard.writeText(shareCode(S.me));toast('Koden kopierad');}catch(e){toast('Markera och kopiera koden manuellt');}};
+  const ds=$('#demoScan'); if(ds)ds.onclick=()=>{
+    ds.disabled=true; ds.textContent='Läser av …';
+    setTimeout(()=>{ds.disabled=false;ds.textContent='Simulera skanning · en vän dyker upp';
+      openAddPreview({...DEMO_SCAN},'scan');
+    },900);
+  };
+  const up=$('#usePaste'); if(up)up.onclick=()=>{
+    const cand=parseShareCode($('#pasteCode').value), msg=$('#pasteMsg');
+    if(!cand){msg.textContent='Koden gick inte att tyda. En giltig kod börjar med KON1.';msg.className='fieldmsg bad';return;}
+    msg.textContent='';openAddPreview(cand,'scan');
+  };
+  const ma=$('#manualAdd'); if(ma)ma.onclick=()=>openManualAdd();
+  renderQR();
+}
+function bindSheet(){
+  const sb=$('#sheetBody');
+  sb.querySelectorAll('[data-addp4]').forEach(b=>b.onclick=()=>openPlus4(b.dataset.addp4));
+  sb.querySelectorAll('[data-selrow]').forEach(r=>r.onclick=e=>{
+    if(e.target.closest('[data-editperson]'))return;
+    const id=r.dataset.selrow; setSel.has(id)?setSel.delete(id):setSel.add(id);
+    r.classList.toggle('sel'); r.querySelector('.cb').textContent=setSel.has(id)?'✓':''; updateSetDel();
+  });
+  const sem=$('#setEditMe'); if(sem)sem.onclick=()=>openEditProfile('me');
+  const sg=$('#setGroups'); if(sg)sg.onclick=openGroups;
+  const scg=$('#setClearGrp'); if(scg)scg.onclick=openClearGroup;
+  sb.querySelectorAll('[data-cleargrp]').forEach(b=>b.onclick=()=>{
+    const g=groupById(b.dataset.cleargrp), ids=new Set(membersOf(g.id).map(p=>p.id));
+    S.people=S.people.filter(p=>!ids.has(p.id));
+    if(cmpB&&!personById(cmpB))cmpB=null; if(cmpA!=='me'&&!personById(cmpA))cmpA='me';
+    saveState();render();toast(`${g.name} tömd — ${ids.size} personer borttagna`);openSettings();
+  });
+  const scd=$('#setClearDemo'); if(scd)scd.onclick=()=>{S.people=S.people.filter(p=>!p.demo);if(cmpB&&!personById(cmpB))cmpB=null;saveState();render();toast('Exempelpersonerna rensade');openSettings();};
+  const srd=$('#setRestoreDemo'); if(srd)srd.onclick=()=>{const have=new Set(S.people.map(p=>p.name));SEED_PEOPLE.forEach(p=>{if(!have.has(p.name))S.people.push({id:uid(),...p,groups:[...p.groups]});});saveState();render();toast('Exempelpersonerna är tillbaka');openSettings();};
+  const sw=$('#setWipe'); if(sw)sw.onclick=()=>{
+    $('#sheetBody').innerHTML=`<h2 style="font-weight:400">Radera all lokal data?</h2><p class="small muted mt6">Din profil, hela kretsen och alla grupper försvinner från den här enheten. Det går inte att ångra.</p>
+    <div class="mt18" style="display:flex;gap:9px"><button class="btn btn-ghost" id="cancelSheet">Avbryt</button><button class="btn btn-gold" id="doReset">Radera allt</button></div>`;bindSheet();};
+  sb.querySelectorAll('[data-editperson]').forEach(b=>b.onclick=()=>openEditProfile(b.dataset.editperson));
+  const esv=$('#eSave'); if(esv)esv.onclick=()=>{
+    const name=$('#eName').value.trim();
+    if(!name){$('#eName').classList.add('err');return;}
+    const r=parseSixDigits($('#eSix').value,null);
+    if(!r.ok){$('#eSixMsg').textContent='Siffrorna bildar inget giltigt datum — ÅÅMMDD.';$('#eSixMsg').className='fieldmsg bad';return;}
+    const p4=$('#eP4').value.replace(/\D/g,'');
+    if(p4.length&&p4.length!==4){$('#eSixMsg').textContent='De extra siffrorna ska vara exakt fyra — eller tomma.';$('#eSixMsg').className='fieldmsg bad';return;}
+    const t=esv.dataset.target, obj=t==='me'?S.me:personById(t);
+    obj.name=name;obj.year=r.year;obj.month=r.month;obj.day=r.day;
+    if(p4.length===4)obj.plus4=p4; else delete obj.plus4;
+    saveState();closeSheet();render();toast('Profilen uppdaterad ✦');
+  };
+  sb.querySelectorAll('[data-toggrp]').forEach(b=>b.onclick=()=>{
+    const p=personById(b.dataset.pid),g=b.dataset.toggrp;
+    const i=p.groups.indexOf(g); if(i>=0)p.groups.splice(i,1); else p.groups.push(g);
+    b.classList.toggle('on'); saveState(); render();
+  });
+  sb.querySelectorAll('[data-cmpwith]').forEach(b=>b.onclick=()=>{cmpMode='pair';cmpA='me';cmpB=b.dataset.cmpwith;closeSheet();go('compare');});
+  sb.querySelectorAll('[data-delperson]').forEach(b=>b.onclick=()=>{
+    const p=personById(b.dataset.delperson);
+    sb.innerHTML=`<h2 style="font-weight:400">Ta bort ${esc(firstName(p.name))}?</h2><p class="small muted mt6">${esc(p.name)} försvinner ur kretsen och alla grupper.</p>
+    <div class="mt18" style="display:flex;gap:9px"><button class="btn btn-ghost" id="cancelSheet">Avbryt</button><button class="btn btn-gold" id="doDel" data-id="${p.id}">Ta bort</button></div>`;
+    bindSheet();
+  });
+  sb.querySelectorAll('[data-delgrp]').forEach(b=>b.onclick=()=>{
+    const g=groupById(b.dataset.delgrp);
+    sb.innerHTML=`<h2 style="font-weight:400">Ta bort gruppen ${esc(g.name)}?</h2><p class="small muted mt6">Personerna i gruppen ligger kvar i kretsen.</p>
+    <div class="mt18" style="display:flex;gap:9px"><button class="btn btn-ghost" id="cancelSheet">Avbryt</button><button class="btn btn-gold" id="doDelGrp" data-id="${g.id}">Ta bort grupp</button></div>`;
+    bindSheet();
+  });
+  const dg=$('#doDelGrp'); if(dg)dg.onclick=()=>{const id=dg.dataset.id;S.groups=S.groups.filter(g=>g.id!==id);S.people.forEach(p=>p.groups=p.groups.filter(x=>x!==id));if(circleFilter===id)circleFilter=null;if(cmpGroup===id)cmpGroup=null;saveState();closeSheet();render();toast('Gruppen borttagen');};
+  const dd=$('#doDel'); if(dd)dd.onclick=()=>{S.people=S.people.filter(p=>p.id!==dd.dataset.id);if(cmpB&&!personById(cmpB))cmpB=null;if(cmpA!=='me'&&!personById(cmpA))cmpA='me';saveState();closeSheet();render();toast('Borttagen ur kretsen');};
+  const esx=$('#eSix'); if(esx)esx.oninput=()=>{const raw=esx.value.replace(/\D/g,'').slice(0,6);esx.value=raw.replace(/(\d{2})(?=\d)/g,'$1 ').trimEnd();};
+  const p4s=$('#p4save'); if(p4s)p4s.onclick=()=>{
+    const v=$('#p4in').value.replace(/\D/g,'');
+    if(v.length!==4){$('#p4msg').textContent='Skriv exakt fyra siffror.';$('#p4msg').className='fieldmsg bad';return;}
+    if(p4s.dataset.target==='me')S.me.plus4=v; else personById(p4s.dataset.target).plus4=v;
+    saveState(); closeSheet(); render(); toast('Djupsignaturen upplåst ✦');
+  };
+  const cs=$('#cancelSheet'); if(cs)cs.onclick=closeSheet;
+  const dr=$('#doReset'); if(dr)dr.onclick=async()=>{S=null;try{if(window.storage)await window.storage.delete(SKEY);}catch(e){}try{localStorage.removeItem(SKEY);}catch(e){}closeSheet();location.reload();};
+  const dcd=$('#doClearDemo'); if(dcd)dcd.onclick=()=>{S.people=S.people.filter(p=>!p.demo);if(cmpB&&!personById(cmpB))cmpB=null;if(cmpA!=='me'&&!personById(cmpA))cmpA='me';saveState();closeSheet();render();toast('Exempelpersonerna rensade');};
+  const cg=$('#createGrp'); if(cg)cg.onclick=()=>{
+    const name=$('#grpName').value.trim(),emoji=$('#grpEmoji').value.trim()||'⭐';
+    if(!name){$('#grpName').classList.add('err');return;}
+    S.groups.push({id:'g_'+uid(),name,emoji}); saveState(); openGroups(); render(); toast(`Gruppen ${name} skapad`);
+  };
+  sb.querySelectorAll('[data-choose]').forEach(b=>b.onclick=()=>{
+    if(sheetCtx?.slot==='A')cmpA=b.dataset.choose; else cmpB=b.dataset.choose;
+    closeSheet(); render();
+  });
+  sb.querySelectorAll('[data-selgrp]').forEach(b=>b.onclick=()=>b.classList.toggle('on'));
+  const ca=$('#confirmAdd'); if(ca)ca.onclick=()=>{
+    const cand=sheetCtx?.cand; if(!cand)return;
+    const groups=[...sb.querySelectorAll('[data-selgrp].on')].map(b=>b.dataset.selgrp);
+    S.people.push({id:uid(),...cand,groups,addedAt:Date.now()});
+    saveState(); closeSheet(); circleFilter=null; go('circle');
+    toast(`${firstName(cand.name)} har lagts till i din konstellation ✦`);
+  };
+  // manual add
+  let mCentury=null;
+  const msx=$('#mSix');
+  const mLive=()=>{
+    const raw=msx.value.replace(/\D/g,''), msg=$('#mSixMsg');
+    if(raw.length<6){msg.textContent='';msx.classList.remove('err');return null;}
+    const r=parseSixDigits(raw,mCentury);
+    if(!r.ok){msg.textContent=r.error==='future'?'Det datumet har inte inträffat ännu.':'Siffrorna bildar inget giltigt datum — ÅÅMMDD.';msg.className='fieldmsg bad';msx.classList.add('err');return null;}
+    msx.classList.remove('err');
+    const flip=r.ambiguous?` <button class="linkish" id="mFlip" style="color:var(--gold-dim);text-decoration:underline;text-underline-offset:2px">inte ${r.year}?</button>`:'';
+    msg.innerHTML=`✓ ${r.day} ${MONTHS[r.month-1]} <b>${r.year}</b>${flip}`;
+    msg.className='fieldmsg good';
+    const f=$('#mFlip'); if(f)f.onclick=()=>{mCentury=(r.year>=2000?1900:2000);mLive();};
+    return r;
+  };
+  if(msx)msx.oninput=()=>{const raw=msx.value.replace(/\D/g,'').slice(0,6);msx.value=raw.replace(/(\d{2})(?=\d)/g,'$1 ').trimEnd();mLive();};
+  const ms=$('#mSubmit'); if(ms)ms.onclick=()=>{
+    const name=$('#mName').value.trim();
+    if(!name){$('#mName').classList.add('err');return;}
+    const r=parseSixDigits(msx.value,mCentury);
+    if(!r.ok){$('#mSixMsg').textContent=r.error==='format'?'Skriv sex siffror — år, månad, dag. T.ex. 700503.':(r.error==='future'?'Det datumet har inte inträffat ännu.':'Siffrorna bildar inget giltigt datum.');$('#mSixMsg').className='fieldmsg bad';return;}
+    const cand={name,year:r.year,month:r.month,day:r.day};
+    const p4=($('#mP4')?.value||'').replace(/\D/g,''); if(p4.length===4)cand.plus4=p4;
+    openAddPreview(cand,'manual');
+  };
+}
+$$('#tabbar .tab').forEach(b=>b.onclick=()=>go(b.dataset.tab));
+
+/* ================= ONBOARDING ================= */
+let onbCentury=null; // null = auto, else 1900/2000
+function showOnboarding(){
+  const onb=$('#onb'); onb.classList.remove('hidden'); $('#tabbar').classList.add('hidden');
+  onb.innerHTML=`
+  <div class="onb-hero fadein">
+    <div class="wordmark">✦ Konstellation</div>
+    <h1>Sex siffror.<br><em>Ett helt mönster.</em></h1>
+    <div class="digitband" aria-hidden="true">${'880715'.split('').map((d,i)=>`<span style="animation:fin .5s ${i*0.07}s both">${d}</span>`).join('')}</div>
+  </div>
+  <div class="valrows">
+    <div class="valrow"><span class="vi">✦</span><p><b>Sex siffror räcker.</b> Födelsedatumet ÅÅMMDD ger hela huvudrapporten — numerologi, två zodiaker, månfas och biorytm.</p></div>
+    <div class="valrow"><span class="vi">＋4</span><p><b>Fyra siffror till är valfritt</b> och låser upp den djupare numerologin — djuptal och sifferprofil. Går att lägga till, ändra eller ta bort när som helst.</p></div>
+    <div class="valrow"><span class="vi">🔒</span><p><b>Lokalt först.</b> Ingenting lagras på någon server — allt bor på din enhet, och du kan ändra eller radera all data när du vill via kugghjulet. Riktig eller påhittad profil — appen frågar aldrig.</p></div>
+  </div>
+  <label class="fld" for="obSix">Dina sex siffror · ÅÅMMDD</label>
+  <input id="obSix" class="pnr num" inputmode="numeric" autocomplete="bday" placeholder="ÅÅ MM DD" maxlength="8">
+  <div class="fieldmsg" id="obSixMsg"></div>
+  <details class="mt6" style="margin-top:10px">
+    <summary class="small" style="color:var(--gold-dim);cursor:pointer;list-style:none">＋ Fyra siffror till? <span style="color:var(--faint)">(valfritt — låser upp din djupsignatur)</span></summary>
+    <input id="obP4" class="pnr num mt6" inputmode="numeric" placeholder="XXXX" maxlength="4" style="margin-top:8px">
+  </details>
+  <label class="fld" for="obName">Ditt namn</label>
+  <input id="obName" placeholder="För- och efternamn" maxlength="60" autocomplete="name">
+  <div class="mt22"><button class="btn btn-gold" id="obGo">Läs mina siffror ✦</button></div>
+  <p class="small center mt14" style="color:var(--faint)">För underhållning och självreflektion — inte vetenskap.</p>`;
+  const six=$('#obSix');
+  const liveMsg=()=>{
+    const raw=six.value.replace(/\D/g,''), msg=$('#obSixMsg');
+    if(raw.length<6){msg.textContent='';six.classList.remove('err');return;}
+    const r=parseSixDigits(raw,onbCentury);
+    if(!r.ok){
+      msg.textContent=r.error==='future'?'Det datumet har inte inträffat ännu.':'Siffrorna bildar inget giltigt datum — ÅÅMMDD, t.ex. 880715.';
+      msg.className='fieldmsg bad'; six.classList.add('err'); return;
+    }
+    six.classList.remove('err');
+    const flip=r.ambiguous?` <button class="linkish" id="obFlip" style="color:var(--gold-dim);text-decoration:underline;text-underline-offset:2px">inte ${r.year}?</button>`:'';
+    msg.innerHTML=`✓ ${r.day} ${MONTHS[r.month-1]} <b>${r.year}</b>${flip}`;
+    msg.className='fieldmsg good';
+    const f=$('#obFlip'); if(f)f.onclick=()=>{onbCentury=(r.year>=2000?1900:2000);liveMsg();};
+  };
+  six.oninput=()=>{ // group as ÅÅ MM DD while typing
+    const raw=six.value.replace(/\D/g,'').slice(0,6);
+    six.value=raw.replace(/(\d{2})(?=\d)/g,'$1 ').trimEnd();
+    liveMsg();
+  };
+  $('#obGo').onclick=()=>{
+    const name=$('#obName').value.trim();
+    const r=parseSixDigits(six.value,onbCentury);
+    if(!r.ok){$('#obSixMsg').textContent=r.error==='format'?'Skriv sex siffror — år, månad, dag. T.ex. 880715.':(r.error==='future'?'Det datumet har inte inträffat ännu.':'Siffrorna bildar inget giltigt datum.');$('#obSixMsg').className='fieldmsg bad';six.classList.add('err');six.focus();return;}
+    if(!name){$('#obName').classList.add('err');$('#obName').focus();return;}
+    const me={name,year:r.year,month:r.month,day:r.day};
+    const p4=($('#obP4')?.value||'').replace(/\D/g,''); if(p4.length===4)me.plus4=p4;
+    S={me,people:SEED_PEOPLE.map(p=>({id:uid(),...p})),groups:SEED_GROUPS.map(g=>({...g}))};
+    saveState();
+    playReveal(me,()=>{ onb.classList.add('hidden'); $('#tabbar').classList.remove('hidden'); $('#gearBtn').classList.remove('hidden'); go('me');
+      setTimeout(()=>toast('Nio exempelpersoner väntar i Kretsen — rensa dem när du vill'),1600); });
+  };
+}
+
+/* --- Reveal sequence --- */
+function playReveal(me,done){
+  const rd=$('#reveal'),st=$('#revealStage'),tx=$('#revealTxt');
+  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduced){done();return;}
+  const digits=`${String(me.year%100).padStart(2,'0')}${String(me.month).padStart(2,'0')}${String(me.day).padStart(2,'0')}`.split('');
+  st.innerHTML=digits.map((d,i)=>`<span class="d" style="transform:translate(-50%,-50%) translate(${(i-digits.length/2+.5)*24}px,0)">${d}</span>`).join('');
+  rd.classList.add('show'); tx.textContent='Läser dina siffror …';
+  const ds=st.querySelectorAll('.d');
+  requestAnimationFrame(()=>ds.forEach(d=>d.style.opacity=1));
+  setTimeout(()=>{ // scatter into orbit
+    tx.textContent='Ritar din stjärnbild …';
+    ds.forEach((d,i)=>{const a=i/ds.length*2*Math.PI-Math.PI/2,r=95+(i%3)*14;
+      d.style.transform=`translate(-50%,-50%) translate(${Math.cos(a)*r}px,${Math.sin(a)*r}px) scale(.8)`;d.style.opacity=.85;});
+  },1000);
+  setTimeout(()=>{ // collapse to star
+    tx.textContent='Din himmel är klar.';
+    ds.forEach(d=>{d.style.transform='translate(-50%,-50%) scale(.2)';d.style.opacity=0;});
+    st.insertAdjacentHTML('beforeend','<div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:44px;color:var(--gold);animation:fin .8s both">✦</div>');
+  },2600);
+  setTimeout(()=>{rd.classList.remove('show');setTimeout(done,300);},3700);
+}
+
+
+/* ================= V2: MÅNE, PERSONLIG DAG, KRAFTDAGAR, ÅRSRING ================= */
+const SYNODIC=29.530588853, NEWMOON_REF=Date.UTC(2000,0,6,18,14);
+function moonPhase(date){
+  const days=(date.getTime()-NEWMOON_REF)/864e5;
+  const frac=(((days%SYNODIC)+SYNODIC)%SYNODIC)/SYNODIC;
+  return {idx:Math.round(frac*8)%8, frac};
+}
+C.moon=[
+ {name:'Nymåne',emoji:'🌑',birth:'Född i mörkrets stillhet — nymånebarn bär pionjärens instinkt: du börjar hellre något eget än ärver något färdigt. Stark intuition, otålig med det gamla.',tone:'en dag att så, inte skörda'},
+ {name:'Växande skära',emoji:'🌒',birth:'Född när ljuset just vänt — du bär spirandets energi: nyfikenhet, framåtlutning, och en vilja att bryta med det som varit. Du behöver mål att växa mot.',tone:'momentum byggs — knuffa försiktigt'},
+ {name:'Första kvarteret',emoji:'🌓',birth:'Född i halvljusets beslutspunkt — du är en görare som trivs mitt i friktionen. Hinder triggar dig snarare än stoppar dig.',tone:'en dag för beslut och handling'},
+ {name:'Växande måne',emoji:'🌔',birth:'Född strax före fullmånen — du bär förfinarens öga: du ser vad som nästan är klart och vad som saknas. Höga krav, stark vilja att fullborda.',tone:'finslipa — skörden närmar sig'},
+ {name:'Fullmåne',emoji:'🌕',birth:'Född i fullt ljus — fullmånebarn lever nära sina känslor och märks i ett rum. Du dras mellan poler och lär dig genom relationer.',tone:'allt syns — känslorna går högt'},
+ {name:'Avtagande måne',emoji:'🌖',birth:'Född när ljuset börjat ge tillbaka — du bär förmedlarens gåva: att smälta erfarenhet och dela den vidare. Människor lyssnar på dig.',tone:'dela, lär ut, tacka'},
+ {name:'Sista kvarteret',emoji:'🌗',birth:'Född i omprövningens ljus — du ifrågasätter det ärvda och behåller bara det som håller. En inre kompass starkare än gruppens.',tone:'släpp det som tjänat klart'},
+ {name:'Avtagande skära',emoji:'🌘',birth:'Född i månvarvets sista viskning — du bär den gamla själens ro: eftertanke, medkänsla och känsla för avslut. Du förstår cykler andra inte ser.',tone:'vila, avsluta, gör plats'}];
+function personalDay(month,day,at){
+  const py=personalYear(month,day,at.getFullYear());
+  return reduce(reduce(py+at.getMonth()+1,false)+at.getDate(),false);
+}
+C.personalDay={1:'starta något',2:'lyssna & vänta in',3:'uttryck dig',4:'bygg & ordna',5:'byt spår, rör dig',6:'ta hand om ditt & dina',7:'gå inåt, tänk klart',8:'förhandla & skörda',9:'avsluta & släpp'};
+const PD_Q={1:.9,2:.5,3:.8,4:.55,5:.75,6:.7,7:.5,8:.85,9:.6};
+function powerDays(p,horizon=30,count=3){
+  const out=[];
+  for(let d=1;d<=horizon;d++){
+    const at=new Date(NOW().getFullYear(),NOW().getMonth(),NOW().getDate()+d);
+    const b=biorhythm({year:p.year,month:p.month,day:p.day},at);
+    const bio=(.4*(b.fysisk+1)/2+.35*(b.emotionell+1)/2+.25*(b.intellektuell+1)/2);
+    const pd=personalDay(p.month,p.day,at);
+    out.push({at,pd,bio,score:bio*.72+PD_Q[pd]*.28});
+  }
+  return out.sort((a,b)=>b.score-a.score).slice(0,count).sort((a,b)=>a.at-b.at);
+}
+function fmtShort(d){ return d.toLocaleDateString('sv-SE',{weekday:'short',day:'numeric',month:'short'}).replace('.',''); }
+function bioTop(b){ const m={fysisk:b.fysisk,emotionell:b.emotionell,intellektuell:b.intellektuell};
+  const k=Object.keys(m).sort((a,c)=>m[c]-m[a])[0];
+  return {fysisk:'kroppen leder',emotionell:'känslan leder',intellektuell:'tanken leder'}[k]; }
+function svgYearRing(py){
+  const size=210,cx=size/2,cy=size/2,R=76;
+  let s=`<svg viewBox="0 0 ${size} ${size}" style="max-width:210px;display:block;margin:0 auto">`;
+  s+=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="rgba(255,255,255,.09)" stroke-width="1"/>`;
+  for(let i=1;i<=9;i++){
+    const a=(i-1)/9*2*Math.PI-Math.PI/2, x=cx+Math.cos(a)*R, y=cy+Math.sin(a)*R, on=i===py;
+    if(on)s+=`<circle cx="${x}" cy="${y}" r="17" fill="rgba(232,199,118,.13)" stroke="var(--gold)" stroke-width="1.4"/>`;
+    s+=`<circle cx="${x}" cy="${y}" r="${on?4:2.6}" fill="${on?'var(--gold)':'rgba(255,255,255,.3)'}"/>`;
+    s+=`<text x="${x}" y="${y-(on?9:7)}" text-anchor="middle" font-size="${on?12:9.5}" fill="${on?'var(--gold)':'rgba(255,255,255,.42)'}" font-family="var(--disp)">${i}</text>`;
+  }
+  s+=`<text x="${cx}" y="${cy-4}" text-anchor="middle" font-size="11" fill="rgba(255,255,255,.5)">år ${py} av 9</text>`;
+  s+=`<text x="${cx}" y="${cy+13}" text-anchor="middle" font-size="12" fill="var(--gold)" font-family="var(--disp)">${C.personalYear[py].tema}</text>`;
+  return s+'</svg>';
+}
+/* rytm-samstämdhet idag, snitt över tre cykler */
+function todaySync(a,b){
+  const na=daysAlive({year:a.year,month:a.month,day:a.day},NOW()), nb=daysAlive({year:b.year,month:b.month,day:b.day},NOW());
+  return Math.round((cycleSync(na,nb,23)+cycleSync(na,nb,28)+cycleSync(na,nb,33))/3);
+}
+
+
+/* ================= V3: DJUPSIGNATUR (+4), GEMENSAM ENERGI, KRITISKA DAGAR ================= */
+function sixOf(p){ return `${String(p.year%100).padStart(2,'0')}${String(p.month).padStart(2,'0')}${String(p.day).padStart(2,'0')}`; }
+function sumD(str){ return String(str).split('').reduce((a,c)=>a+ +c,0); }
+function deepNumber(p){ if(!p.plus4)return null; return reduce(sumD(sixOf(p)+p.plus4),true); }
+function digitCounts(p){ // counts of 1-9 across all 10 digits
+  const c={}; for(let i=1;i<=9;i++)c[i]=0;
+  for(const d of sixOf(p)+(p.plus4||'')) if(d!=='0')c[+d]++;
+  return c;
+}
+function leadDigit(p){ const c=digitCounts(p); let best=1; for(let i=2;i<=9;i++)if(c[i]>c[best])best=i; return c[best]>0?best:null; }
+function digitSimilarity(a,b){ // cosine of digit-count vectors
+  const ca=digitCounts(a),cb=digitCounts(b); let dot=0,na=0,nb=0;
+  for(let i=1;i<=9;i++){dot+=ca[i]*cb[i];na+=ca[i]**2;nb+=cb[i]**2;}
+  return na&&nb?dot/Math.sqrt(na*nb):0;
+}
+function sharedDigits(a,b){ const ca=digitCounts(a),cb=digitCounts(b),out=[];
+  for(let i=1;i<=9;i++)if(ca[i]&&cb[i])out.push(i); return out; }
+const triad=n=>n===11?2:n===22?4:n===33?6:n; // masters join their root families
+function deepAffinity(a,b){
+  if(a===b)return 92;
+  if([11,22,33].includes(a)&&[11,22,33].includes(b))return 86;
+  const fam=x=>[[1,5,7],[2,4,8],[3,6,9]].findIndex(f=>f.includes(triad(x)%9===0?9:((triad(x)-1)%9)+1));
+  return fam(a)===fam(b)?80:62;
+}
+function deepCompatibility(A,B){ // requires plus4 on both
+  if(!A.plus4||!B.plus4)return null;
+  const base=compatibility(A,B).score, dA=deepNumber(A), dB=deepNumber(B);
+  const aff=deepAffinity(dA,dB), sim=digitSimilarity(A,B);
+  return {score:Math.round(base*0.55+aff*0.27+sim*100*0.18), dA, dB, aff, shared:sharedDigits(A,B), sim};
+}
+/* Gemensam energi: hur höga båda är samtidigt (0-100) — varierar över tid, till skillnad från fasen */
+function jointEnergy(A,B,at){
+  const a=biorhythm({year:A.year,month:A.month,day:A.day},at), b=biorhythm({year:B.year,month:B.month,day:B.day},at);
+  let s=0; for(const k of ['fysisk','emotionell','intellektuell']) s+=Math.sqrt(((a[k]+1)/2)*((b[k]+1)/2));
+  return Math.round(s/3*100);
+}
+function jointSeries(A,B,days=30){ const out=[];
+  for(let d=0;d<=days;d++){const at=new Date(NOW().getFullYear(),NOW().getMonth(),NOW().getDate()+d);out.push({d,at,v:jointEnergy(A,B,at)});}
+  return out; }
+function energyTrend(A,B){ // idag vs snitt +3..+9 dagar
+  const now=jointEnergy(A,B,NOW()); let s=0;
+  for(let d=3;d<=9;d++)s+=jointEnergy(A,B,new Date(NOW().getFullYear(),NOW().getMonth(),NOW().getDate()+d));
+  const diff=s/7-now; return diff>4?1:diff<-4?-1:0;
+}
+function criticalDays(p,horizon=14){ // cykel korsar noll = omställningsdag
+  const out=[], names={fysisk:'fysisk',emotionell:'emotionell',intellektuell:'intellektuell'};
+  let prev=biorhythm({year:p.year,month:p.month,day:p.day},NOW());
+  for(let d=1;d<=horizon;d++){
+    const at=new Date(NOW().getFullYear(),NOW().getMonth(),NOW().getDate()+d);
+    const b=biorhythm({year:p.year,month:p.month,day:p.day},at);
+    for(const k of Object.keys(names)) if(Math.sign(b[k])!==Math.sign(prev[k])&&out.length<3) out.push({d,at,cycle:names[k],rising:b[k]>prev[k]});
+    prev=b;
+  }
+  return out;
+}
+function selfEnergy(p,at){ const b=biorhythm({year:p.year,month:p.month,day:p.day},at);
+  return (.4*(b.fysisk+1)/2+.35*(b.emotionell+1)/2+.25*(b.intellektuell+1)/2); }
+function svgSpark(series,W=352,H=84,marks=true){
+  const max=Math.max(...series.map(s=>s.v)),min=Math.min(...series.map(s=>s.v));
+  const X=i=>14+i/(series.length-1)*(W-28), Y=v=>H-16-((v-min)/Math.max(1,max-min))*(H-34);
+  let path='M'+series.map((s,i)=>`${X(i).toFixed(1)},${Y(s.v).toFixed(1)}`).join(' L');
+  const pk=series.reduce((a,b)=>b.v>a.v?b:a), lo=series.reduce((a,b)=>b.v<a.v?b:a);
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" aria-label="Energiprognos">
+  <line x1="14" x2="${W-14}" y1="${H-16}" y2="${H-16}" stroke="rgba(160,175,210,.15)"/>
+  <path d="${path}" fill="none" stroke="var(--gold)" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="${path} L${X(series.length-1)},${H-16} L14,${H-16} Z" fill="rgba(232,199,118,.07)" stroke="none"/>`;
+  if(marks){
+    s+=`<circle cx="${X(series.indexOf(pk))}" cy="${Y(pk.v)}" r="3.4" fill="var(--gold)"/>`;
+    s+=`<circle cx="${X(series.indexOf(lo))}" cy="${Y(lo.v)}" r="3" fill="none" stroke="rgba(160,175,210,.6)" stroke-width="1.2"/>`;
+    s+=`<circle cx="${X(0)}" cy="${Y(series[0].v)}" r="2.6" fill="#fff" opacity=".8"/>`;
+    s+=`<text x="14" y="${H-3}" font-size="9" fill="rgba(255,255,255,.4)">idag</text>`;
+    s+=`<text x="${W-14}" y="${H-3}" font-size="9" text-anchor="end" fill="rgba(255,255,255,.4)">+30 d</text>`;
+  }
+  return s+'</svg>';
+}
+C.deep={
+ 1:'Under ytan driver du dig själv hårdare än någon annan gör — självständigheten är inte en pose, den är motorn.',
+ 2:'Under ytan läser du av varje rum. Din verkliga styrka är den osynliga: att få andra att fungera.',
+ 3:'Under ytan pågår ett ständigt berättande — du formulerar världen för att förstå den.',
+ 4:'Under ytan söker du ordning även när du verkar spontan. Struktur är din trygghet, inte din bur.',
+ 5:'Under ytan bor en rastlöshet som aldrig riktigt sover — frihet är ditt icke förhandlingsbara.',
+ 6:'Under ytan tar du ansvar för fler än någon anar. Omsorgen är din tysta ryggrad.',
+ 7:'Under ytan pågår ett eget samtal — du behöver ensamheten för att höra dig själv tänka.',
+ 8:'Under ytan väger du kraft och konsekvens — du förstår makt bättre än du låtsas om.',
+ 9:'Under ytan bär du fler människors historier än dina egna — medkänslan är din undertext.',
+ 11:'Under ytan går känselspröten alltid på högsta känslighet — du uppfattar det osagda före alla andra.',
+ 22:'Under ytan ritar du på större byggen än du berättar om — visionen är tålmodig.',
+ 33:'Under ytan bär du en ovanlig kombination: stor värme och stor vilja, i tjänst hos andra.'};
+C.digitWords={1:'vilja',2:'lyhördhet',3:'uttryck',4:'ordning',5:'rörelse',6:'omsorg',7:'djup',8:'kraft',9:'vidsyn'};
+
+
+/* ================= V4: RELATIONSTAL, INSIKTER, TALTONER ================= */
+C.numTone={1:'viljan att gå först',2:'balansen mellan två',3:'glädjen i att uttrycka',4:'tryggheten i det byggda',5:'friheten i rörelsen',6:'värmen i ansvaret',7:'djupet i eftertanken',8:'kraften i genomförandet',9:'vidden i medkänslan',11:'känsligheten som ser mer',22:'bygget som tar tid',33:'värmen som leder'};
+C.numMeta={
+ liv:{t:'Livstal',d:'Summan av hela ditt födelsedatum — din grundriktning genom livet, det största av dina tal.'},
+ bdag:{t:'Födelsedagstal',d:'Dagen du föddes på, oreducerad gåva — färgar hur livstalet tar sig uttryck i vardagen.'},
+ pyr:{t:'Personligt år',d:'Var i nioårscykeln du står just nu. Byter varje kalenderår och sätter årets tema.'},
+ namn:{t:'Namntal',d:'Bokstäverna i ditt namn omräknade till tal — hur du uppfattas utåt, din klang i ett rum.'},
+ djup:{t:'Djuptal',d:'Alla tio siffrorna sammanvägda — din undertext, det som verkar under ytan. Låses upp av de fyra extra siffrorna.'},
+ bar:{t:'Bärande siffra',d:'Den siffra som återkommer oftast bland dina tio — tonen som färgar helheten.'}};
+function relationTal(a,b){ return reduce(a+b,true); }
+/* Parvisa insikter: styrkan, skavet, det intressanta */
+function pairInsights(A,B,c){
+  const parts=[{k:'el',v:c.el,pos:'elementen förstärker varandra',neg:'elementen drar åt olika håll'},
+               {k:'cn',v:c.cn,pos:'årsdjuren hör ihop',neg:'årsdjuren skaver'},
+               {k:'lp',v:c.lp,pos:'livstalen talar samma språk',neg:'livstalen har olika tempo'},
+               {k:'sim',v:c.sim,pos:'signaturerna är påfallande lika',neg:'signaturerna är varandras kontrast'}];
+  const hi=parts.reduce((a,b)=>b.v>a.v?b:a), lo=parts.reduce((a,b)=>b.v<a.v?b:a);
+  const styrka={el:`${A.zodiac.element} möter ${B.zodiac.element.toLowerCase()} — ${hi.pos}. Det är grundackordet i er relation, det som bär när annat gnisslar.`,
+    cn:`${A.chinese.animal} och ${B.chinese.animal.toLowerCase()} — ${hi.pos}. En vänskap årsdjuren skrivit under på i förväg.`,
+    lp:`Livstal ${A.lifePath} och ${B.lifePath} — ${hi.pos}. Ni förstår varandras sätt att vilja saker.`,
+    sim:`Era signaturer ligger nära varandra — ${hi.pos}. Ni känner igen er i varandras sätt att vara.`}[hi.k];
+  const skav={el:`${lo.neg}: ${A.zodiac.element.toLowerCase()} och ${B.zodiac.element.toLowerCase()} behöver översätta sig för varandra. Räkna med olika standardlägen.`,
+    cn:`${lo.neg} — ${A.chinese.animal.toLowerCase()} och ${B.chinese.animal.toLowerCase()} tar inte alltid samma väg. Ge varandra omvägarna.`,
+    lp:`${lo.neg}: talen ${A.lifePath} och ${B.lifePath} vill olika fort. Den som väntar gör det av kärlek.`,
+    sim:`${lo.neg} — ni fyller i varandras luckor snarare än speglar varandra. Styrka, om ni låter det vara det.`}[lo.k];
+  // det intressanta: samla kuriosa, ta de 2 bästa
+  const facts=[];
+  const mA=moonPhase(new Date(A.year,A.month-1,A.day,12)), mB=moonPhase(new Date(B.year,B.month-1,B.day,12));
+  if(mA.idx===mB.idx)facts.push(`Ni föddes båda under ${C.moon[mA.idx].name.toLowerCase()} — samma himmel, olika år.`);
+  if(Math.abs(A.zodiacIdx-B.zodiacIdx)===6)facts.push('Era stjärntecken står mitt emot varandra på zodiakhjulet — klassiska spegelpar som lär varandra det de själva saknar.');
+  if(A.weekday===B.weekday)facts.push(`Båda födda på en ${A.weekday} — ${C.weekdayLore[A.weekday]}.`);
+  if(A.chinese.animalIdx===B.chinese.animalIdx)facts.push(`Samma årsdjur — ${A.chinese.animal.toLowerCase()} känner igen ${B.chinese.animal.toLowerCase()}.`);
+  const dd=Math.abs(A.bio.n-B.bio.n);
+  facts.push(`Det skiljer ${dd.toLocaleString('sv-SE')} dagar mellan er — ${dd%7===0?'jämnt antal veckor, era veckodagar löper i takt':dd<3000?'nästan jämnåriga i dagar räknat':'olika kapitel av samma tid'}.`);
+  if(A.plus4&&B.plus4){const sh=sharedDigits(A,B); if(sh.length>=3)facts.push(`Tre eller fler gemensamma siffror i era tio — ovanligt likt material.`);}
+  return {styrka,skav,facts:facts.slice(0,2),hi,lo};
+}
+function miniEssens(P){
+  return `${P.zodiac.name}s ${P.zodiac.element.toLowerCase()} · livstal ${P.lifePath} — ${C.lifePath[P.lifePath].title.toLowerCase()} · ${P.chinese.element.toLowerCase()}-${P.chinese.animal.toLowerCase()}${P.plus4?` · djuptal ${deepNumber(P)}`:''}`;
+}
+/* ================= INIT ================= */
+(async function init(){
+  paintSky(); addEventListener('resize',paintSky);
+  // load QR lib (best effort, fallback exists)
+  const scr=document.createElement('script');
+  scr.src='https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+  scr.onload=()=>{ if(TAB==='connect')renderQR(); };
+  document.head.appendChild(scr);
+  $('#gearBtn').onclick=()=>openSettings();
+  S=await loadState();
+  if(!S||!S.me){ S=null; showOnboarding(); }
+  else{ $('#tabbar').classList.remove('hidden'); $('#gearBtn').classList.remove('hidden'); go('me'); }
+})();
+</script>
+</body>
+</html>
