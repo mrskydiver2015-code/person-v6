@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Konstellation — dina tio siffror, ditt mönster</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230B101D'/%3E%3Cpath d='M16 4L19 13L28 16L19 19L16 28L13 19L4 16L13 13Z' fill='%23E8C776'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,340;0,9..144,460;0,9..144,620;1,9..144,400&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -19,16 +20,19 @@
   --sans:"Sora",-apple-system,"Segoe UI",Roboto,sans-serif;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html{scroll-behavior:smooth}
+html{height:100%;overflow:hidden}
 body{background:#060910;color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.55;
-  min-height:100dvh;display:flex;justify-content:center}
-#frame{width:100%;max-width:440px;min-height:100dvh;position:relative;background:
+  height:100dvh;overflow:hidden;display:flex;justify-content:center}
+#frame{width:100%;height:100%;min-height:0;position:relative;background:
   radial-gradient(120% 60% at 50% -5%, #17203B 0%, var(--bg) 55%, #080C16 100%);
   box-shadow:0 0 90px rgba(0,0,0,.6);display:flex;flex-direction:column;overflow:hidden}
 #sky{position:absolute;inset:0;pointer-events:none;z-index:0;opacity:.9}
-#appwrap{position:relative;z-index:1;display:flex;flex-direction:column;min-height:100dvh}
-main{flex:1;overflow-y:auto;padding:0 18px 108px;scrollbar-width:none}
-main::-webkit-scrollbar{display:none}
+/* One bounded page scroller shared by onboarding and every report view. */
+#appwrap{position:relative;z-index:1;flex:1;min-height:0;min-width:0;overflow-y:auto;scrollbar-width:none}
+#appwrap::-webkit-scrollbar{display:none}
+#appwrap:has(#onb:not(.hidden)) main{display:none}
+main{padding:0 18px calc(108px + env(safe-area-inset-bottom))}
+#frame:has(.sheet.show) #appwrap{overflow:hidden}
 
 /* ---------- Typography ---------- */
 h1,h2,h3,.disp{font-family:var(--disp);font-weight:460;letter-spacing:.005em}
@@ -80,7 +84,7 @@ label.fld{display:block;font-size:12px;color:var(--muted);margin:12px 0 6px;lett
 :focus-visible{outline:2px solid var(--gold-dim);outline-offset:2px;border-radius:6px}
 
 /* ---------- Tab bar ---------- */
-#tabbar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:440px;z-index:40;
+#tabbar{position:absolute;bottom:0;left:0;width:100%;z-index:40;
   display:flex;padding:8px 10px calc(10px + env(safe-area-inset-bottom));
   background:linear-gradient(180deg,rgba(9,13,23,.6),rgba(9,13,23,.96) 40%);
   backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--hair)}
@@ -117,7 +121,7 @@ label.fld{display:block;font-size:12px;color:var(--muted);margin:12px 0 6px;lett
   font-family:var(--disp);font-size:17px;border:1px solid var(--hair);position:relative}
 .avatar .zsym{position:absolute;bottom:-4px;right:-4px;font-size:11px;background:var(--bg2);border:1px solid var(--hair);
   border-radius:99px;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-family:var(--sans)}
-.pmeta{flex:1;min-width:0}
+.pmeta{flex:1;min-width:0;overflow:hidden}
 .pmeta b{display:block;font-weight:600;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pmeta .sub{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .matchbadge{font-size:12px;font-weight:600;color:var(--gold);flex-shrink:0;text-align:right}
@@ -126,12 +130,12 @@ label.fld{display:block;font-size:12px;color:var(--muted);margin:12px 0 6px;lett
 /* ---------- Sheets ---------- */
 #scrim{position:fixed;inset:0;background:rgba(4,6,12,.6);backdrop-filter:blur(3px);z-index:60;opacity:0;pointer-events:none;transition:opacity .25s}
 #scrim.show{opacity:1;pointer-events:auto}
-.sheet{position:fixed;bottom:0;left:50%;transform:translate(-50%,105%);width:100%;max-width:440px;max-height:88dvh;
+.sheet{position:fixed;bottom:0;left:50%;transform:translate(-50%,105%);width:100%;max-height:88dvh;
   z-index:70;background:linear-gradient(180deg,#141B30,#0E1424);border-radius:24px 24px 0 0;border:1px solid var(--hair);border-bottom:none;
   transition:transform .32s cubic-bezier(.2,.9,.25,1);display:flex;flex-direction:column}
 .sheet.show{transform:translate(-50%,0)}
 .sheet .grab{width:38px;height:4px;border-radius:99px;background:rgba(255,255,255,.16);margin:10px auto 2px;flex-shrink:0}
-.sheet .body{overflow-y:auto;padding:10px 20px calc(26px + env(safe-area-inset-bottom));scrollbar-width:none}
+.sheet .body{min-height:0;overscroll-behavior-y:contain;overflow-y:auto;padding:10px 20px calc(26px + env(safe-area-inset-bottom));scrollbar-width:none}
 .sheet .body::-webkit-scrollbar{display:none}
 
 /* ---------- Onboarding ---------- */
@@ -229,7 +233,8 @@ label.fld{display:block;font-size:12px;color:var(--muted);margin:12px 0 6px;lett
 .duorytm .cellr{border:1px solid var(--line);border-radius:14px;padding:11px;background:rgba(255,255,255,.02)}
 .duorytm .cellr b{font-size:12.5px;display:block;margin-bottom:8px}
 .duorytm .cellr .bd{font-size:10.5px;color:var(--faint);margin-top:7px;line-height:1.45}
-#onb{position:absolute;inset:0;z-index:50;display:flex;flex-direction:column;overflow-y:auto;padding:0 26px 40px}
+#onb{position:relative;display:flex;flex-direction:column;padding:0 26px 40px}
+.onb-intro,.onb-form{display:contents}
 .onb-hero{padding-top:11dvh;text-align:center}
 .wordmark{font-family:var(--disp);font-size:13px;letter-spacing:.42em;text-transform:uppercase;color:var(--gold);font-weight:460}
 .onb-hero h1{font-size:36px;margin-top:22px;font-weight:340}
@@ -328,6 +333,43 @@ label.fld{display:block;font-size:12px;color:var(--muted);margin:12px 0 6px;lett
 .hidden{display:none!important}
 .mt6{margin-top:6px}.mt10{margin-top:10px}.mt14{margin-top:14px}.mt18{margin-top:18px}.mt22{margin-top:22px}
 .center{text-align:center}
+/* ---------- Desktop shell ---------- */
+@media (min-width:768px){
+  body{padding:24px;background:radial-gradient(ellipse at 50% 0,#1B2440 0,#0B101D 48%,#060910 100%);align-items:center}
+  #frame{max-width:800px;border:1px solid rgba(255,255,255,.08);border-radius:28px;
+    background:linear-gradient(160deg,rgba(23,32,59,.88),rgba(8,12,22,.94));
+    backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);box-shadow:0 28px 80px rgba(0,0,0,.45)}
+  #frame:has(#onb:not(.hidden)),#frame:has(main[data-view="connect"]){max-width:720px}
+  main{padding:0 28px 108px}
+  .viewhead{padding:28px 44px 8px 2px}
+  #tabbar{padding:10px 24px 12px}
+  .tab{flex-direction:row;justify-content:center;gap:9px;font-size:12px;padding:12px 0}
+  .tab .dotmark{display:none}
+  .gear{top:20px;right:24px}
+  #onb{min-height:100%;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;align-content:center;padding:32px}
+  .onb-intro,.onb-form{display:block;min-width:0}
+  .onb-hero{padding-top:0;text-align:left}
+  .wordmark{font-size:11px;letter-spacing:.3em}
+  .onb-hero h1{font-size:34px;margin-top:18px}
+  .onb-hero .digitband{justify-content:flex-start;margin:20px 0 6px}
+  .valrows{margin:14px 0 0}
+  .valrow{gap:8px;padding:8px 0}
+  .valrow p{font-size:12px}
+  .valrow .vi,.insrow .ic{white-space:nowrap}
+  .onb-form{align-self:center;padding:20px;border:1px solid var(--hair);border-radius:20px;background:rgba(148,168,220,.055)}
+  .onb-form label.fld:first-child{margin-top:0}
+  .report-grid,.comparison-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start;margin-top:14px}
+  .report-grid>*,.comparison-grid>*{min-width:0;margin-top:0}
+  .report-grid>.mehero,.report-grid>p,.comparison-grid>*{grid-column:1/-1}
+  .comparison-grid>section.card{grid-column:auto;height:100%}
+  .report-grid>.card{height:100%}
+  .report-grid .spread,.comparison-grid .spread{flex-wrap:wrap}
+  .report-grid .numsplit,.comparison-grid .numsplit{gap:12px}
+  .sheet{max-width:640px;bottom:24px;max-height:calc(100% - 48px);border:1px solid var(--hair);border-radius:24px;
+    transform:translate(-50%,calc(100% + 24px));box-shadow:0 24px 80px rgba(0,0,0,.5)}
+  .sheet.show{transform:translate(-50%,0)}
+  .sheet .body{padding:18px 28px 28px}
+}
 </style>
 </head>
 <body>
@@ -335,10 +377,9 @@ label.fld{display:block;font-size:12px;color:var(--muted);margin:12px 0 6px;lett
   <canvas id="sky"></canvas>
   <div id="appwrap">
     <main id="main"></main>
+    <!-- Onboarding shares the page scroller. -->
+    <div id="onb" class="hidden"></div>
   </div>
-
-  <!-- Onboarding -->
-  <div id="onb" class="hidden"></div>
   <!-- Reveal sequence -->
   <div id="reveal"><div id="revealStage"></div><div id="revealTxt"></div></div>
 
@@ -863,9 +904,10 @@ function paintSky(){
 
 /* ================= ROUTER ================= */
 let TAB='me';
-function go(tab){ TAB=tab; $$('#tabbar .tab').forEach(b=>b.classList.toggle('on',b.dataset.tab===tab)); render(); $('#main').scrollTop=0; }
+function go(tab){ TAB=tab; $$('#tabbar .tab').forEach(b=>b.classList.toggle('on',b.dataset.tab===tab)); render(); $('#appwrap').scrollTop=0; }
 function render(){
   const m=$('#main');
+  m.dataset.view=TAB;
   if(TAB==='me')m.innerHTML=viewMe();
   else if(TAB==='circle')m.innerHTML=viewCircle();
   else if(TAB==='compare')m.innerHTML=viewCompare();
@@ -898,7 +940,7 @@ function viewMe(){
   const kritiska=criticalDays(p);
   return `
   <div class="viewhead"><span class="eyebrow">Din rapport</span><h1>${esc(firstName(p.name))}<span class="serif-i" style="color:var(--gold)">s himmel</span></h1></div>
-  <div class="stagger">
+  <div class="stagger report-grid">
   <section class="mehero">
     <div class="zbig">${p.zodiac.sym}</div>
     <h2 style="font-weight:340;font-size:24px">${esc(p.name)}</h2>
@@ -1153,7 +1195,7 @@ function viewCompare(){
   return `
   <div class="viewhead"><span class="eyebrow">Jämför</span><h1>Mönster <span class="serif-i" style="color:var(--gold)">emellan</span></h1></div>
   <div class="seg"><button class="${cmpMode==='overview'?'on':''}" data-cmpmode="overview">Alla mot dig</button><button class="${cmpMode==='pair'?'on':''}" data-cmpmode="pair">Två personer</button><button class="${cmpMode==='group'?'on':''}" data-cmpmode="group">Grupp</button></div>
-  ${inner}`;
+  <div class="comparison-grid">${inner}</div>`;
 }
 function cmpOverview(){
   const me=meProf();
@@ -1547,7 +1589,7 @@ function bindView(root){
   root.querySelectorAll('[data-cmpmode]').forEach(b=>b.onclick=()=>{cmpMode=b.dataset.cmpmode;render();});
   root.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>openPicker(b.dataset.pick));
   root.querySelectorAll('[data-pickgrp]').forEach(b=>b.onclick=()=>{cmpGroup=b.dataset.pickgrp;render();});
-  root.querySelectorAll('[data-cmprow]').forEach(b=>b.onclick=()=>{cmpMode='pair';cmpA='me';cmpB=b.dataset.cmprow;render();$('#main').scrollTop=0;});
+  root.querySelectorAll('[data-cmprow]').forEach(b=>b.onclick=()=>{cmpMode='pair';cmpA='me';cmpB=b.dataset.cmprow;render();$('#appwrap').scrollTop=0;});
   root.querySelectorAll('[data-ovfilter]').forEach(b=>b.onclick=()=>{cmpOvFilter=b.dataset.ovfilter||null;render();});
   const p4m=$('#addPlus4Me'); if(p4m)p4m.onclick=()=>openPlus4('me');
   root.querySelectorAll('[data-tal]').forEach(b=>b.onclick=()=>openNumberSheet(b.dataset.tal,+b.dataset.v));
@@ -1698,7 +1740,7 @@ let onbCentury=null; // null = auto, else 1900/2000
 function showOnboarding(){
   const onb=$('#onb'); onb.classList.remove('hidden'); $('#tabbar').classList.add('hidden');
   onb.innerHTML=`
-  <div class="onb-hero fadein">
+  <div class="onb-intro"><div class="onb-hero fadein">
     <div class="wordmark">✦ Konstellation</div>
     <h1>Sex siffror.<br><em>Ett helt mönster.</em></h1>
     <div class="digitband" aria-hidden="true">${'880715'.split('').map((d,i)=>`<span style="animation:fin .5s ${i*0.07}s both">${d}</span>`).join('')}</div>
@@ -1708,6 +1750,8 @@ function showOnboarding(){
     <div class="valrow"><span class="vi">＋4</span><p><b>Fyra siffror till är valfritt</b> och låser upp den djupare numerologin — djuptal och sifferprofil. Går att lägga till, ändra eller ta bort när som helst.</p></div>
     <div class="valrow"><span class="vi">🔒</span><p><b>Lokalt först.</b> Ingenting lagras på någon server — allt bor på din enhet, och du kan ändra eller radera all data när du vill via kugghjulet. Riktig eller påhittad profil — appen frågar aldrig.</p></div>
   </div>
+  </div>
+  <div class="onb-form">
   <label class="fld" for="obSix">Dina sex siffror · ÅÅMMDD</label>
   <input id="obSix" class="pnr num" inputmode="numeric" autocomplete="bday" placeholder="ÅÅ MM DD" maxlength="8">
   <div class="fieldmsg" id="obSixMsg"></div>
@@ -1718,7 +1762,7 @@ function showOnboarding(){
   <label class="fld" for="obName">Ditt namn</label>
   <input id="obName" placeholder="För- och efternamn" maxlength="60" autocomplete="name">
   <div class="mt22"><button class="btn btn-gold" id="obGo">Läs mina siffror ✦</button></div>
-  <p class="small center mt14" style="color:var(--faint)">För underhållning och självreflektion — inte vetenskap.</p>`;
+  <p class="small center mt14" style="color:var(--faint)">För underhållning och självreflektion — inte vetenskap.</p></div>`;
   const six=$('#obSix');
   const liveMsg=()=>{
     const raw=six.value.replace(/\D/g,''), msg=$('#obSixMsg');
